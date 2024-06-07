@@ -11,7 +11,7 @@ class ChatPage(ft.Container):
         
         self.page = page
         self.padding = 20
-        self.bgcolor = ft.colors.WHITE
+        self.bgcolor = "#f2ede7"
         self.border_radius = 20
         self.expand = True
 
@@ -23,7 +23,7 @@ class ChatPage(ft.Container):
 
     # UIの初期化
     def initialize_ui(self):
-        self.title = ft.Text("おしゃべりできます", size = 28, weight = "w800") # type: ignore
+        self.title = ft.Text("会話してみる", size = 28, weight = "w800") # type: ignore
         self.main = self.create_ChatContentDisplay()
         self.divider = ft.Divider(height = 6, color = "transparent")
         self.prompt = self.create_PromptField(self.main.content)
@@ -37,9 +37,9 @@ class ChatPage(ft.Container):
                 auto_scroll = True,
             ),
             width = 520,
-            height = 620,
-            bgcolor = "#F4F4F4",
-            border_radius = 10,
+            height = 580,
+            bgcolor = "#e0dfda",
+            border_radius = 20,
             padding = 15,
         )
 
@@ -52,6 +52,7 @@ class ChatPage(ft.Container):
         return ft.Column(
             [
                 self.title, # 見出し
+                self.divider,
                 self.main,  # チャット表示
                 self.divider,   # スペース
                 self.prompt,    # プロンプト入力欄 # type: ignore
@@ -107,7 +108,7 @@ class Prompt(ft.TextField):
             ]
         )
         response_text = completion.choices[0].message.content
-        self.animate_text_output(name = "( ˘ω˘ )", prompt = response_text) # type: ignore
+        self.animate_text_output(name = "^^)", prompt = response_text) # type: ignore
     
     # すべてのメソッドを実行 
     def run_prompt(self, event) -> None:

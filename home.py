@@ -14,29 +14,24 @@ class MainPage(ft.View):
             route="/flet/home",
             vertical_alignment=ft.MainAxisAlignment.START,
             horizontal_alignment=ft.CrossAxisAlignment.START,
-            bgcolor=ft.colors.WHITE,
         )
         
         self.page = page
-        self.bgcolor = "#f0f4f9"
+        self.bgcolor = "#aaa7a5"
+        
+        self.mascot = self.create_mascot()
         
         self.rail = self.create_nav_rail()
-        self.rail_container = ft.Container(content=self.rail, border_radius=10)
+        self.rail_container = ft.Container(content=self.rail, border_radius=20)
         
         self.views = self.init_views()
         self.content_view = ft.Container(
             content=self.views[0],
             expand=True,
-            bgcolor="#ffffff",
             border_radius=10,
         )
         
-        
         self.controls = [self.create_main_layout()]
-    
-    def toggle_extended(self,e):
-        self.extended = not self.extended
-        self.update()
     
     def create_nav_rail(self):
         destinations = [
@@ -61,10 +56,12 @@ class MainPage(ft.View):
             selected_index=0,
             label_type=ft.NavigationRailLabelType.ALL,
             min_width=80,
-            group_alignment=-0.8,
-            bgcolor="#ffffff",
+            group_alignment=-0.9,
+            bgcolor="#f2ede7",
             destinations=rail_destinations,
-            leading=ft.Container(content=ft.IconButton(icon=ft.icons.MENU,icon_size=30, on_click=lambda e: print("")),padding=ft.margin.only(top=20)), # type: ignore
+            indicator_shape=ft.CircleBorder(),
+            indicator_color="#d2d2d2",
+            leading=self.mascot,
             on_change=self.handle_nav_change,
         )
     
@@ -83,8 +80,7 @@ class MainPage(ft.View):
         return ft.Container(
             content=self.views[index],
             expand=True,
-            bgcolor="#ffffff",
-            border_radius=10,
+            border_radius=20,
         )
     
     def create_main_layout(self):
@@ -97,6 +93,23 @@ class MainPage(ft.View):
             expand=True,
             vertical_alignment=ft.CrossAxisAlignment.STRETCH,
         )
+
+    def create_mascot(self):
+        return ft.Container(
+            content = ft.IconButton(
+                content=ft.Image(
+                    src=f"/images/1_64.png",
+                    fit=ft.ImageFit.FILL,
+                    width = 50,
+                    height = 50,
+                )
+            ),
+            padding=ft.margin.only(top=15) # type: ignore
+        )
+       
+
+    def mascot_clicked(self,e):
+        pass
         
     def handle_nav_change(self, e):
         selected_index = e.control.selected_index
