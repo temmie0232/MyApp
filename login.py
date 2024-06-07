@@ -55,7 +55,8 @@ class Login(ft.View):
                 self.register_btn,
             ],
             alignment=ft.MainAxisAlignment.CENTER,
-            horizontal_alignment=ft.CrossAxisAlignment.CENTER),
+            horizontal_alignment=ft.CrossAxisAlignment.CENTER
+            ),
             bgcolor="#ffffff",
             width=320,
             height=330,
