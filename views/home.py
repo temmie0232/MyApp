@@ -1,11 +1,11 @@
 import flet as ft
 
 class HomePage(ft.Container):
-    def __init__(self, page):
+    def __init__(self,page):
         super().__init__()
+        
         self.page = page
-        self.content = ft.Text("ホームページのコンテンツ")
         self.padding = 20
-        self.bgcolor = ft.colors.WHITE
-        self.border_radius = 10
+        self.bgcolor = "#f2ede7"
+        self.border_radius = 20
         self.expand = True
