@@ -46,22 +46,30 @@ class MainPage(ft.View):
         
         rail_destinations = [
             ft.NavigationRailDestination(
-                icon_content=ft.Icon(dest["icon"]), 
-                selected_icon_content=ft.Icon(dest["selected_icon"]), 
-                label=dest["label"]
+                icon_content=ft.Container(
+                    content=ft.Icon(dest["icon"], size=27),
+                    padding=ft.padding.only(bottom=5,top=5)  # 下部にスペースを追加
+                ),
+                selected_icon_content=ft.Container(
+                    content=ft.Icon(dest["selected_icon"], size=27),
+                    padding=ft.padding.only(bottom=5,top=5)  # 下部にスペースを追加
+                ),
+                label=dest["label"],
             ) for dest in destinations
         ]
+        
         
         return ft.NavigationRail(
             selected_index=0,
             label_type=ft.NavigationRailLabelType.ALL,
-            min_width=80,
+            min_width=100,
             group_alignment=-0.9,
             bgcolor="#f2ede7",
             destinations=rail_destinations,
             indicator_shape=ft.CircleBorder(),
             indicator_color="#d2d2d2",
             leading=self.mascot,
+            #trailing=self.post_btn,
             on_change=self.handle_nav_change,
         )
     
