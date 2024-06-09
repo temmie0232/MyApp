@@ -21,6 +21,8 @@ class MainPage(ft.View):
         
         self.mascot = self.create_mascot()
         
+        self.post_btn = self.create_post_btn()
+        
         self.rail = self.create_nav_rail()
         self.rail_container = ft.Container(content=self.rail, border_radius=20)
         
@@ -69,7 +71,7 @@ class MainPage(ft.View):
             indicator_shape=ft.CircleBorder(),
             indicator_color="#d2d2d2",
             leading=self.mascot,
-            #trailing=self.post_btn,
+            trailing=self.post_btn,
             on_change=self.handle_nav_change,
         )
     
@@ -114,7 +116,16 @@ class MainPage(ft.View):
             ),
             padding=ft.margin.only(top=15) # type: ignore
         )
-       
+    
+    def create_post_btn(self):
+        return ft.Container(
+            content = ft.IconButton(
+                    icon = ft.icons.HISTORY_EDU,
+                    width = 40,
+                    height = 40,
+                    #on_click=lambda e:pass,
+            )
+        )
 
     def mascot_clicked(self,e):
         pass
