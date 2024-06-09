@@ -6,6 +6,7 @@ from views.messages import MessagesPage
 from views.chat import ChatPage
 from views.profile import ProfilePage
 from views.settings import SettingsPage
+from component.post import PostPage
 
 
 class MainPage(ft.View):
@@ -23,8 +24,13 @@ class MainPage(ft.View):
         
         self.post_btn = self.create_post_btn()
         
+        self.post_page = self.create_post_page()
+        self.post_page_ = self.create_post_page_()
+        
         self.rail = self.create_nav_rail()
         self.rail_container = ft.Container(content=self.rail, border_radius=20)
+        
+        
         
         self.views = self.init_views()
         self.content_view = ft.Container(
@@ -123,7 +129,7 @@ class MainPage(ft.View):
                     icon = ft.icons.HISTORY_EDU,
                     width = 40,
                     height = 40,
-                    #on_click=lambda e:pass,
+                    on_click=self.show_post_page,
             )
         )
 
@@ -134,3 +140,26 @@ class MainPage(ft.View):
         selected_index = e.control.selected_index
         self.content_view.content = self.views[selected_index]
         self.update()
+
+    def create_post_page(self):
+        post_page = PostPage()
+        return post_page
+
+    def create_post_page_(self):
+        return ft.AlertDialog(content=ft.Text("Hello"))
+
+    # ダイアログを表示
+    def show_post_page(self,e):
+        self.page.dialog = self.post_page # type: ignore
+        self.post_page.open = True
+        self.page.update() # type: ignore
+    
+    # ダイアログを閉じる
+    def close_dlg(self,e):
+        self.post_page.open = False
+        self.page.update()  # type: ignore
+    
+        
+    
+        
+
