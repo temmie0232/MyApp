@@ -8,11 +8,16 @@ class PostPage(ft.AlertDialog):
             content = ft.Container(
                 content = ft.Column([
                     # 取消ボタン
-                    ft.IconButton(icon=ft.icons.CLOSE,on_click = self.close_dlg),
-                    ft.Text("i")
+                    ft.IconButton(icon=ft.icons.CLOSE,icon_color=ft.colors.BLACK,on_click = self.close_dlg),
+                    ft.TextField(hint_text="おなかすいたー",multiline=True,filled=True,border_radius=ft.border_radius.all(5),min_lines=10,border_color=ft.colors.GREY,bgcolor=ft.colors.WHITE),
+                    
+                    
                 ]),
-                height = 200
-            )
+                height = 322,
+                width = 500,
+            ),
+            actions=[ft.IconButton(icon=ft.icons.SEND,icon_color=ft.colors.BLACK,tooltip="投稿する")],
+            bgcolor="#f2ede7",
         )
     
     def submit_post(self,e):

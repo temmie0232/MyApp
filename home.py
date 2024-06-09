@@ -125,12 +125,19 @@ class MainPage(ft.View):
     
     def create_post_btn(self):
         return ft.Container(
-            content = ft.IconButton(
-                    icon = ft.icons.HISTORY_EDU,
+            content = ft.Column([
+                ft.Divider(),
+                ft.Container(ft.IconButton(
+                    icon = ft.icons.RATE_REVIEW_OUTLINED,
                     width = 40,
                     height = 40,
-                    on_click=self.show_post_page,
-            )
+                    on_click = self.show_post_page,
+                    icon_color = "#e6e6e6",
+                    icon_size = 25,
+                    tooltip = "投稿する"),
+                bgcolor = "#8f8e8b",
+                border_radius=ft.border_radius.all(15)),
+            ])
         )
 
     def mascot_clicked(self,e):
