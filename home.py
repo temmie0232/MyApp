@@ -21,16 +21,12 @@ class MainPage(ft.View):
         self.bgcolor = "#aaa7a5"
         
         self.mascot = self.create_mascot()
-        
         self.post_btn = self.create_post_btn()
         
         self.post_page = self.create_post_page()
-        self.post_page_ = self.create_post_page_()
         
         self.rail = self.create_nav_rail()
         self.rail_container = ft.Container(content=self.rail, border_radius=20)
-        
-        
         
         self.views = self.init_views()
         self.content_view = ft.Container(
@@ -56,16 +52,15 @@ class MainPage(ft.View):
             ft.NavigationRailDestination(
                 icon_content=ft.Container(
                     content=ft.Icon(dest["icon"], size=27),
-                    padding=ft.padding.only(bottom=5,top=5)  # 下部にスペースを追加
+                    padding=ft.padding.only(bottom=5,top=5)
                 ),
                 selected_icon_content=ft.Container(
                     content=ft.Icon(dest["selected_icon"], size=27),
-                    padding=ft.padding.only(bottom=5,top=5)  # 下部にスペースを追加
+                    padding=ft.padding.only(bottom=5,top=5)
                 ),
                 label=dest["label"],
             ) for dest in destinations
         ]
-        
         
         return ft.NavigationRail(
             selected_index=0,
@@ -120,53 +115,45 @@ class MainPage(ft.View):
                     height = 50,
                 )
             ),
-            padding=ft.margin.only(top=15) # type: ignore
+            padding=ft.margin.only(top=15)
         )
     
     def create_post_btn(self):
         return ft.Container(
             content = ft.Column([
-                ft.Divider(),
+                ft.Container(height=5),
                 ft.Container(ft.IconButton(
                     icon = ft.icons.RATE_REVIEW_OUTLINED,
                     width = 40,
                     height = 40,
                     on_click = self.show_post_page,
-                    icon_color = "#e6e6e6",
+                    icon_color = "#000000",
                     icon_size = 25,
                     tooltip = "投稿する"),
-                bgcolor = "#8f8e8b",
-                border_radius=ft.border_radius.all(15)),
+                bgcolor = "#f2ede7",
+                border = ft.border.all(2, ft.colors.BLACK),
+                border_radius=ft.border_radius.all(10)),
             ])
         )
-
-    def mascot_clicked(self,e):
-        pass
         
     def handle_nav_change(self, e):
         selected_index = e.control.selected_index
         self.content_view.content = self.views[selected_index]
         self.update()
 
+    # PostPage のインスタンスを作成
     def create_post_page(self):
-        post_page = PostPage()
-        return post_page
-
-    def create_post_page_(self):
-        return ft.AlertDialog(content=ft.Text("Hello"))
+        return PostPage(self.page)
 
     # ダイアログを表示
-    def show_post_page(self,e):
-        self.page.dialog = self.post_page # type: ignore
+    def show_post_page(self, e):
+        self.page.dialog = self.post_page  # ダイアログをページに設定
         self.post_page.open = True
-        self.page.update() # type: ignore
-    
-    # ダイアログを閉じる
-    def close_dlg(self,e):
-        self.post_page.open = False
-        self.page.update()  # type: ignore
-    
-        
-    
-        
+        self.page.update()  # ページを更新してダイアログを表示
 
+    # ダイアログを閉じる
+    def close_dlg(self, e):
+        self.post_page.open = False
+        self.page.update()  # ページを更新してダイアログを閉じるo
+        
+    
