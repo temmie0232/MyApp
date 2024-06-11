@@ -1,4 +1,5 @@
 import flet as ft
+import requests
 
 class PostPage(ft.AlertDialog):
     def __init__(self, page):
@@ -50,14 +51,28 @@ class PostPage(ft.AlertDialog):
     # ダイアログを閉じる
     def close_dlg(self, e):
         self.open = False
-        self.page.update()
+        self.page.update() # type: ignore
 
     # 投稿内容(フィールド)をリセット
     def reset_post(self):
         self.text_field.value = ""  # テキストフィールドを空白にする
-        self.page.update()  # ページを更新して変更を反映
+        self.page.update()  # type: ignore # ページを更新して変更を反映
 
     # 投稿する
     def submit_post(self, e):
-        print("投稿が完了しました！")
-        self.reset_post()
+        content = self.text_field.value
+        # ログインセッションからユーザーIDを取得
+        user_id = self.page.session.get("user_id")
+
+        if user_id is None:
+            print("このセッションでユーザーIDが使用できません")
+            return ... # エラーハンドリング
+
+        response = requests.post("http://127.0.0.1:5000/post",json={"user_id": user_id, "content": content})
+        
+        if response.status_code == 201:
+            print("投稿が完了しました！")
+            self.reset_post()
+            self.close_dlg(e)
+        else:
+            print("投稿に失敗しました。")

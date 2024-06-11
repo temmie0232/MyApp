@@ -84,7 +84,14 @@ class Login(ft.View):
         
         response = requests.post("http://127.0.0.1:5000/login", json={"email": email, "password": password})
 
-        if response.status_code == 200:
+        if response.status_code == 200:     
+            # ログイン成功時のユーザー情報   
+            user_data = response.json()
+            # ユーザーIDを取得
+            user_id = user_data.get("user_id")
+            
+            # ログイン成功時、セッションにユーザーIDを保存
+            self.page.session.set("user_id", user_id)
             self.page.go("/flet/home") # type: ignore
         else:
             self.dlg_message.content = ft.Text("メールアドレスまたはパスワードが無効です")
