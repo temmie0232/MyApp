@@ -94,7 +94,7 @@ class Login(ft.View):
             
             # ユーザーIDをセッションに保存
             if user_id:
-                self.page.session.set("user_id", user_id)
+                self.page.session.set("user_id", user_id) # type: ignore
                 print(f"Logged in user_id: {user_id}")  # デバッグ用
                 self.page.go("/flet/home")  # type: ignore
             else:

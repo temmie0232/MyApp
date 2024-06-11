@@ -1,6 +1,6 @@
 import flet as ft
 
-class HomePage(ft.Container):
+class TimelinePage(ft.Container):
     def __init__(self,page):
         super().__init__()
         

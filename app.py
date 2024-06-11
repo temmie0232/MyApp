@@ -77,7 +77,7 @@ def login():
         connection.close()
 
     if user_record and check_password_hash(user_record[4], password): # type: ignore
-        user_id = user_record[0]
+        user_id = user_record[0] # type: ignore
         session["user_id"] = user_id
         return jsonify({"message": "Login successful!","user_id": user_id}), 200
     else:

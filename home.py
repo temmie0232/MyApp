@@ -1,5 +1,5 @@
 import flet as ft
-from views.home import HomePage
+from views.timeline import TimelinePage
 from views.search import SearchPage
 from views.notifications import NotificationsPage
 from views.messages import MessagesPage
@@ -78,7 +78,7 @@ class MainPage(ft.View):
     
     def init_views(self):
         return {
-            0: HomePage(self.page),
+            0: TimelinePage(self.page),
             1: SearchPage(self.page),
             2: NotificationsPage(self.page),
             3: MessagesPage(self.page),
@@ -115,7 +115,7 @@ class MainPage(ft.View):
                     height = 50,
                 )
             ),
-            padding=ft.margin.only(top=15)
+            padding=ft.margin.only(top=15) # type: ignore
         )
     
     def create_post_btn(self):
@@ -147,13 +147,13 @@ class MainPage(ft.View):
 
     # ダイアログを表示
     def show_post_page(self, e):
-        self.page.dialog = self.post_page  # ダイアログをページに設定
+        self.page.dialog = self.post_page  # type: ignore # ダイアログをページに設定
         self.post_page.open = True
-        self.page.update()  # ページを更新してダイアログを表示
+        self.page.update()  # type: ignore # ページを更新してダイアログを表示
 
     # ダイアログを閉じる
     def close_dlg(self, e):
         self.post_page.open = False
-        self.page.update()  # ページを更新してダイアログを閉じるo
+        self.page.update()  # type: ignore # ページを更新してダイアログを閉じるo
         
     
