@@ -6,6 +6,9 @@ from datetime import datetime, timedelta
 app = Flask(__name__)
 
 app.secret_key = "D3tvn426"
+app.config["SESSION_PERMANENT"] = True
+app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(minutes=60)  # 例: セッションの有効期限を60分に設定
+
 
 def connect_db():
     return mysql.connector.connect(
@@ -66,13 +69,17 @@ def login():
     try:
         cursor.execute("SELECT * FROM users WHERE email=%s", (email,))
         user_record = cursor.fetchone()
+        # デバック用
+        print(f"Database returned: {user_record}")
+        
     finally:
         cursor.close()
         connection.close()
 
-    if user_record and check_password_hash(user_record[3], password): # type: ignore
-
-        return jsonify({"message": "Login successful!"}), 200
+    if user_record and check_password_hash(user_record[4], password): # type: ignore
+        user_id = user_record[0]
+        session["user_id"] = user_id
+        return jsonify({"message": "Login successful!","user_id": user_id}), 200
     else:
         return jsonify({"message": "Invalid credentials"}), 401
 

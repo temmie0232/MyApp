@@ -68,6 +68,8 @@ class PostPage(ft.AlertDialog):
             print("このセッションでユーザーIDが使用できません")
             return ... # エラーハンドリング
 
+        print(f"Posting as user_id: {user_id}") 
+        
         response = requests.post("http://127.0.0.1:5000/post",json={"user_id": user_id, "content": content})
         
         if response.status_code == 201:

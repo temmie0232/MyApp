@@ -87,12 +87,23 @@ class Login(ft.View):
         if response.status_code == 200:     
             # ログイン成功時のユーザー情報   
             user_data = response.json()
+            # サーバーからのレスポンスを確認
+            print(f"Server response data: {user_data}")
             # ユーザーIDを取得
             user_id = user_data.get("user_id")
             
-            # ログイン成功時、セッションにユーザーIDを保存
-            self.page.session.set("user_id", user_id)
-            self.page.go("/flet/home") # type: ignore
+            # ユーザーIDをセッションに保存
+            if user_id:
+                self.page.session.set("user_id", user_id)
+                print(f"Logged in user_id: {user_id}")  # デバッグ用
+                self.page.go("/flet/home")  # type: ignore
+            else:
+                print("ユーザーIDが取得できませんでした。")
+                self.dlg_message.content = ft.Text("ユーザーIDが取得できませんでした。")
+                self.dlg_message.open = True
+                self.page.dialog = self.dlg_message  # type: ignore
+                self.page.update()  # type: ignore
+
         else:
             self.dlg_message.content = ft.Text("メールアドレスまたはパスワードが無効です")
             self.dlg_message.open = True
