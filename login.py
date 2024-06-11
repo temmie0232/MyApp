@@ -12,7 +12,7 @@ class Login(ft.View):
         self.page = page
         self.page.title = "login"
         self.page.theme_mode = ft.ThemeMode.LIGHT
-        self.bgcolor = "#f0f4f9"
+        self.bgcolor = "#aba7a5"
         
         self.initialize_ui()
         self.controls = [self.login_container]
@@ -57,7 +57,7 @@ class Login(ft.View):
             alignment=ft.MainAxisAlignment.CENTER,
             horizontal_alignment=ft.CrossAxisAlignment.CENTER
             ),
-            bgcolor="#ffffff",
+            bgcolor="#f2ede7",
             width=320,
             height=330,
             border_radius=10,
@@ -84,8 +84,26 @@ class Login(ft.View):
         
         response = requests.post("http://127.0.0.1:5000/login", json={"email": email, "password": password})
 
-        if response.status_code == 200:
-            self.page.go("/flet/home") # type: ignore
+        if response.status_code == 200:     
+            # ログイン成功時のユーザー情報   
+            user_data = response.json()
+            # サーバーからのレスポンスを確認
+            print(f"Server response data: {user_data}")
+            # ユーザーIDを取得
+            user_id = user_data.get("user_id")
+            
+            # ユーザーIDをセッションに保存
+            if user_id:
+                self.page.session.set("user_id", user_id) # type: ignore
+                print(f"Logged in user_id: {user_id}")  # デバッグ用
+                self.page.go("/flet/home")  # type: ignore
+            else:
+                print("ユーザーIDが取得できませんでした。")
+                self.dlg_message.content = ft.Text("ユーザーIDが取得できませんでした。")
+                self.dlg_message.open = True
+                self.page.dialog = self.dlg_message  # type: ignore
+                self.page.update()  # type: ignore
+
         else:
             self.dlg_message.content = ft.Text("メールアドレスまたはパスワードが無効です")
             self.dlg_message.open = True

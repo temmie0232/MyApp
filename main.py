@@ -27,7 +27,7 @@ def main(page: ft.Page) -> None:
         page.update()
     
     page.on_route_change = route_handler
-    page.go("/flet/home")
+    page.go("/flet/login")
 
 if __name__ == "__main__":
     ft.app(

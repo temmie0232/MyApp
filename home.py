@@ -1,11 +1,12 @@
 import flet as ft
-from views.home import HomePage
+from views.timeline import TimelinePage
 from views.search import SearchPage
 from views.notifications import NotificationsPage
 from views.messages import MessagesPage
 from views.chat import ChatPage
 from views.profile import ProfilePage
 from views.settings import SettingsPage
+from component.post import PostPage
 
 
 class MainPage(ft.View):
@@ -20,6 +21,9 @@ class MainPage(ft.View):
         self.bgcolor = "#aaa7a5"
         
         self.mascot = self.create_mascot()
+        self.post_btn = self.create_post_btn()
+        
+        self.post_page = self.create_post_page()
         
         self.rail = self.create_nav_rail()
         self.rail_container = ft.Container(content=self.rail, border_radius=20)
@@ -46,28 +50,35 @@ class MainPage(ft.View):
         
         rail_destinations = [
             ft.NavigationRailDestination(
-                icon_content=ft.Icon(dest["icon"]), 
-                selected_icon_content=ft.Icon(dest["selected_icon"]), 
-                label=dest["label"]
+                icon_content=ft.Container(
+                    content=ft.Icon(dest["icon"], size=27),
+                    padding=ft.padding.only(bottom=5,top=5)
+                ),
+                selected_icon_content=ft.Container(
+                    content=ft.Icon(dest["selected_icon"], size=27),
+                    padding=ft.padding.only(bottom=5,top=5)
+                ),
+                label=dest["label"],
             ) for dest in destinations
         ]
         
         return ft.NavigationRail(
             selected_index=0,
             label_type=ft.NavigationRailLabelType.ALL,
-            min_width=80,
+            min_width=100,
             group_alignment=-0.9,
             bgcolor="#f2ede7",
             destinations=rail_destinations,
             indicator_shape=ft.CircleBorder(),
             indicator_color="#d2d2d2",
             leading=self.mascot,
+            trailing=self.post_btn,
             on_change=self.handle_nav_change,
         )
     
     def init_views(self):
         return {
-            0: HomePage(self.page),
+            0: TimelinePage(self.page),
             1: SearchPage(self.page),
             2: NotificationsPage(self.page),
             3: MessagesPage(self.page),
@@ -106,12 +117,43 @@ class MainPage(ft.View):
             ),
             padding=ft.margin.only(top=15) # type: ignore
         )
-       
-
-    def mascot_clicked(self,e):
-        pass
+    
+    def create_post_btn(self):
+        return ft.Container(
+            content = ft.Column([
+                ft.Container(height=5),
+                ft.Container(ft.IconButton(
+                    icon = ft.icons.RATE_REVIEW_OUTLINED,
+                    width = 40,
+                    height = 40,
+                    on_click = self.show_post_page,
+                    icon_color = "#000000",
+                    icon_size = 25,
+                    tooltip = "投稿する"),
+                bgcolor = "#f2ede7",
+                border = ft.border.all(2, ft.colors.BLACK),
+                border_radius=ft.border_radius.all(10)),
+            ])
+        )
         
     def handle_nav_change(self, e):
         selected_index = e.control.selected_index
         self.content_view.content = self.views[selected_index]
         self.update()
+
+    # PostPage のインスタンスを作成
+    def create_post_page(self):
+        return PostPage(self.page)
+
+    # ダイアログを表示
+    def show_post_page(self, e):
+        self.page.dialog = self.post_page  # type: ignore # ダイアログをページに設定
+        self.post_page.open = True
+        self.page.update()  # type: ignore # ページを更新してダイアログを表示
+
+    # ダイアログを閉じる
+    def close_dlg(self, e):
+        self.post_page.open = False
+        self.page.update()  # type: ignore # ページを更新してダイアログを閉じるo
+        
+    

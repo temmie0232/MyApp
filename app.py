@@ -1,9 +1,14 @@
-from flask import Flask, request, jsonify
+from flask import Flask,session, request, jsonify
 import mysql.connector
 from werkzeug.security import generate_password_hash, check_password_hash
-from datetime import datetime
+from datetime import datetime, timedelta
 
 app = Flask(__name__)
+
+app.secret_key = "D3tvn426"
+app.config["SESSION_PERMANENT"] = True
+app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(minutes=60)  # 例: セッションの有効期限を60分に設定
+
 
 def connect_db():
     return mysql.connector.connect(
@@ -64,14 +69,59 @@ def login():
     try:
         cursor.execute("SELECT * FROM users WHERE email=%s", (email,))
         user_record = cursor.fetchone()
+        # デバック用
+        print(f"Database returned: {user_record}")
+        
     finally:
         cursor.close()
         connection.close()
 
-    if user_record and check_password_hash(user_record[3], password): # type: ignore
-        return jsonify({"message": "Login successful!"}), 200
+    if user_record and check_password_hash(user_record[4], password): # type: ignore
+        user_id = user_record[0] # type: ignore
+        session["user_id"] = user_id
+        return jsonify({"message": "Login successful!","user_id": user_id}), 200
     else:
         return jsonify({"message": "Invalid credentials"}), 401
+
+
+@app.route("/post", methods=["POST"])
+def create_post():
+    data = request.get_json()
+    
+    user_id = data.get("user_id")
+    content = data.get("content")
+    parent_post_id = data.get("parent_post_id")
+    media_url = data.get("media_url")
+
+    if not user_id or not content:
+        return jsonify({"message": "User ID and content are required"}), 400
+    
+    connection = connect_db()
+    cursor = connection.cursor()
+
+    try:
+        # SQLクエリの構築
+        query = """
+            INSERT INTO posts (user_id,content,parent_post_id,media_url)
+            VALUES (%s,%s,%s,%s)
+        """
+
+        # 値をタプルとして準備
+        values = (user_id, content, parent_post_id, media_url)
+        
+        # 実行
+        cursor.execute(query,values)
+        connection.commit()
+
+        return jsonify({"message": "Post created successfully!"}),201
+    except mysql.connector.Error as err:
+        print("Something went wrong: {}".format(err))
+        return jsonify({"message": "Post creation failed", "error": str(err)}), 500
+    finally:
+        cursor.close()
+        connection.close()
+
+
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0")
