@@ -13,7 +13,7 @@ class SignupStep1(ft.View):
 
         self.page = page
         self.page.title = "step1"
-        self.bgcolor = "#f0f4f9"
+        self.bgcolor = "#aba7a5"
 
         self.text_1 = ft.Text(
             "MyAppに新規登録 : STEP1", size=20, weight=ft.FontWeight.W_600, font_family="Segoe_UI_BOLD"
@@ -82,7 +82,7 @@ class SignupStep1(ft.View):
                 alignment=ft.MainAxisAlignment.CENTER,
                 horizontal_alignment=ft.CrossAxisAlignment.CENTER,
             ),
-            bgcolor="#ffffff",
+            bgcolor="#f2ede7",
             width=360,
             height=510,
             border_radius=10,
@@ -152,7 +152,7 @@ class SignupStep2(ft.View):
 
         self.page = page
         self.page.title = "step2"
-        self.bgcolor = "#f0f4f9"
+        self.bgcolor = "#aba7a5"
 
         self.text_1 = ft.Text(
             "MyAppに新規登録 : STEP2", size=20, weight=ft.FontWeight.W_600, font_family="Segoe_UI_BOLD"
@@ -244,7 +244,7 @@ class SignupStep2(ft.View):
                     alignment=ft.MainAxisAlignment.CENTER,
                     horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                 ),
-                bgcolor="#ffffff",
+                bgcolor="#f2ede7",
                 width=360,
                 height=440,
                 border_radius=10,

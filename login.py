@@ -12,7 +12,7 @@ class Login(ft.View):
         self.page = page
         self.page.title = "login"
         self.page.theme_mode = ft.ThemeMode.LIGHT
-        self.bgcolor = "#f0f4f9"
+        self.bgcolor = "#aba7a5"
         
         self.initialize_ui()
         self.controls = [self.login_container]
@@ -57,7 +57,7 @@ class Login(ft.View):
             alignment=ft.MainAxisAlignment.CENTER,
             horizontal_alignment=ft.CrossAxisAlignment.CENTER
             ),
-            bgcolor="#ffffff",
+            bgcolor="#f2ede7",
             width=320,
             height=330,
             border_radius=10,
