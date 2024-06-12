@@ -4,7 +4,7 @@ import requests
 class Login(ft.View):
     def __init__(self, page):
         super().__init__(
-            route="/flet/login",
+            route="/login",
             vertical_alignment=ft.MainAxisAlignment.CENTER,
             horizontal_alignment=ft.CrossAxisAlignment.CENTER,
         )
@@ -96,7 +96,7 @@ class Login(ft.View):
             if user_id:
                 self.page.session.set("user_id", user_id) # type: ignore
                 print(f"Logged in user_id: {user_id}")  # デバッグ用
-                self.page.go("/flet/home")  # type: ignore
+                self.page.go("/home")  # type: ignore
             else:
                 print("ユーザーIDが取得できませんでした。")
                 self.dlg_message.content = ft.Text("ユーザーIDが取得できませんでした。")
@@ -111,7 +111,7 @@ class Login(ft.View):
             self.page.update() # type: ignore
 
     def handle_register(self, e):
-        self.page.go("/flet/signup") # type: ignore
+        self.page.go("/signup") # type: ignore
         
     def close_error_dialog(self, e):
         self.dlg_message.open = False

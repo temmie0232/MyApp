@@ -6,7 +6,7 @@ import requests
 class SignupStep1(ft.View):
     def __init__(self, page):
         super().__init__(
-            route="/flet/signup",
+            route="/signup",
             vertical_alignment=ft.MainAxisAlignment.CENTER,
             horizontal_alignment=ft.CrossAxisAlignment.CENTER,
         )
@@ -115,7 +115,7 @@ class SignupStep1(ft.View):
         self.page.session.set("email", self.regist_mail.value) # type: ignore
         self.page.session.set("password", self.regist_pass.value) # type: ignore
         self.page.session.set("email_opt_in", int(self.check_mail_wrap.controls[0].value))  # type: ignore
-        self.page.go("/flet/signup/2") # type: ignore
+        self.page.go("/signup/2") # type: ignore
 
     def show_step1_help(self, e):
         errors = []
@@ -145,7 +145,7 @@ class SignupStep1(ft.View):
 class SignupStep2(ft.View):
     def __init__(self, page):
         super().__init__(
-            route="/flet/signup/2",
+            route="/signup/2",
             vertical_alignment=ft.MainAxisAlignment.CENTER,
             horizontal_alignment=ft.CrossAxisAlignment.CENTER,
         )
@@ -325,7 +325,7 @@ class SignupStep2(ft.View):
     def close_success_dialog(self, e):
         self.dlg_success.open = False
         self.page.update() # type: ignore
-        self.page.go("/flet/login") # type: ignore
+        self.page.go("/login") # type: ignore
 
     def close_error_dialog(self, e):
         self.dlg_message.open = False
