@@ -13,7 +13,7 @@ def main(page: ft.Page) -> None:
     def router(route):
         page.views.clear()
         
-        if page.route == "/":
+        if page.route == "/" or page.route == "/login":
             print(f"{route} に移動しました")
             login = Login(page)
             page.views.append(login)
@@ -38,7 +38,7 @@ def main(page: ft.Page) -> None:
     page.on_route_change = router
     
     #初期は"/"からスタート
-    page.go("/")
+    page.go("/home")
     
     """
     def navigate(route, view_class):
