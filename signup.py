@@ -173,6 +173,7 @@ class SignupStep2(ft.View):
             on_change=self.validate_step2_form,
             max_length=20,
             helper_text="英数字 と _ のみ",
+            prefix_text="@"
         )
 
         self.date_picker = ft.DatePicker(
@@ -267,7 +268,7 @@ class SignupStep2(ft.View):
 
     def register(self, e):
         user_name = self.regist_user_name.value
-        user_id = self.regist_user_id.value
+        user_id ="@" + self.regist_user_id.value.lstrip("@") # type: ignore
         email = self.page.session.get("email") # type: ignore
         password = self.page.session.get("password") # type: ignore
         email_opt_in = self.page.session.get("email_opt_in") # type: ignore
