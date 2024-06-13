@@ -4,10 +4,13 @@ import requests
 class PostPage(ft.AlertDialog):
     def __init__(self, page):
         
+        self.page = page
+        
         self.text_field = self.create_text_field()
         self.text_count = ft.Text("0/200")
         self.dlg = self.create_dlg()
         self.post_btn = self.create_post_btn()
+        self.page.snack_bar = ft.SnackBar(content=ft.Text("投稿がかんりょうしました！"),action="OK")
         
         super().__init__(
             # 本体
@@ -17,8 +20,6 @@ class PostPage(ft.AlertDialog):
             modal=True
         )
         
-        self.page = page
-
     def create_text_field(self):
         return ft.TextField(
             hint_text="何が起きてる？",
@@ -28,7 +29,7 @@ class PostPage(ft.AlertDialog):
             min_lines=10,
             border_color=ft.colors.GREY,
             bgcolor=ft.colors.WHITE,
-            on_change=self.check_text_length
+            on_change=self.check_text_length,
         )
         
     # 投稿用ダイアログの作成
@@ -108,7 +109,9 @@ class PostPage(ft.AlertDialog):
         
         if response.status_code == 201:
             print("投稿が完了しました！")
+            self.page.snack_bar.open = True
             self.reset_post()
             self.close_dlg(e)
+            self.page.update() # type: ignore
         else:
             print("投稿に失敗しました。")
