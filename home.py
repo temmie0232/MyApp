@@ -12,7 +12,7 @@ from component.post import PostPage
 class MainPage(ft.View):
     def __init__(self, page):
         super().__init__(
-            route="/flet/home",
+            route="/home",
             vertical_alignment=ft.MainAxisAlignment.START,
             horizontal_alignment=ft.CrossAxisAlignment.START,
         )

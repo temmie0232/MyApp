@@ -84,6 +84,48 @@ def login():
         return jsonify({"message": "Invalid credentials"}), 401
 
 
+@app.route("/timeline", methods=["GET"])
+def get_timeline():
+    # データベースに接続
+    connection = connect_db()
+    cursor = connection.cursor(dictionary=True)
+
+    try:
+        # 投稿を取得するクエリ
+        cursor.execute("""
+            SELECT 
+                posts.post_id, 
+                users.user_id AS user_id, 
+                posts.content, 
+                posts.created_at, 
+                posts.updated_at, 
+                posts.likes_count, 
+                posts.repost_count, 
+                posts.replies_count, 
+                posts.parent_post_id, 
+                posts.media_url, 
+                users.user_name
+            FROM posts
+            JOIN users ON posts.user_id = users.id
+            WHERE posts.is_deleted = 0
+            ORDER BY posts.created_at DESC 
+        """)
+
+        # 結果を取得
+        posts = cursor.fetchall()
+        print("Fetched posts: ", posts)  # デバッグ用に取得した投稿を表示
+
+        # 取得したデータをJSONで返す
+        return jsonify(posts), 200
+    except mysql.connector.Error as err:
+        print("Something went wrong: {}".format(err))
+        return jsonify({"message": "Failed to fetch posts", "error": str(err)}), 500
+    finally:
+        cursor.close()
+        connection.close()
+
+
+
 @app.route("/post", methods=["POST"])
 def create_post():
     data = request.get_json()
