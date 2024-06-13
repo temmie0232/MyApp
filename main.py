@@ -33,12 +33,18 @@ def main(page: ft.Page) -> None:
             mainpage = MainPage(page)
             page.views.append(mainpage)
 
+        if page.route.startswith("/profile"):
+            user_id = page.route.split("/")[-1]
+            print(f"{route} に移動しました - ユーザーID: {user_id}")
+            profile_page = ProfilePage(page, user_id=user_id)
+            page.views.append(profile_page)
+
         page.update()
     
     page.on_route_change = router
     
     #初期は"/"からスタート
-    page.go("/home")
+    page.go("/")
     
     """
     def navigate(route, view_class):

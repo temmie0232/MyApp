@@ -77,13 +77,20 @@ class MainPage(ft.View):
         )
     
     def init_views(self):
+        # セッションからユーザーIDを取得
+        user_id = self.page.session.get("user_id") 
+
+        if user_id is None:
+            self.page.go("/login")
+            return{}
+        
         return {
             0: TimelinePage(self.page),
             1: SearchPage(self.page),
             2: NotificationsPage(self.page),
             3: MessagesPage(self.page),
             4: ChatPage(self.page),
-            5: ProfilePage(self.page),
+            5: ProfilePage(self.page,user_id=user_id),
             6: SettingsPage(self.page),
         }
     
@@ -113,10 +120,10 @@ class MainPage(ft.View):
                     fit=ft.ImageFit.FILL,
                     width = 50,
                     height = 50,
-                )
+                ),
             ),
             padding=ft.margin.only(top=15) # type: ignore
-        )
+        )    
     
     def create_post_btn(self):
         return ft.Container(
@@ -143,13 +150,13 @@ class MainPage(ft.View):
 
     # PostPage のインスタンスを作成
     def create_post_page(self):
-        return PostPage(self.page)
+        return PostPage
 
     # ダイアログを表示
     def show_post_page(self, e):
         self.page.dialog = self.post_page  # type: ignore # ダイアログをページに設定
         self.post_page.open = True
-        self.page.update()  # type: ignore # ページを更新してダイアログを表示
+        self.page.update()  # type: ignore # ページを更新してダイアログを表示    # ダイアログを表示
 
     # ダイアログを閉じる
     def close_dlg(self, e):

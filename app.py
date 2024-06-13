@@ -163,7 +163,26 @@ def create_post():
         cursor.close()
         connection.close()
 
-
+@app.route('/user/<user_id>', methods=['GET'])
+def get_user_profile(user_id):
+    connection = connect_db()
+    cursor = connection.cursor(dictionary=True)
+    
+    try:
+        query = "SELECT user_id, user_name, icon_url, bio, created_at FROM users WHERE id = %s"
+        cursor.execute(query, (user_id,))
+        user = cursor.fetchone()
+        
+        if user:
+            return jsonify(user), 200
+        else:
+            return jsonify({"message": "User not found"}), 404
+    except mysql.connector.Error as err:
+        print("Error: {}".format(err))
+        return jsonify({"message": "Error fetching user data"}), 500
+    finally:
+        cursor.close()
+        connection.close()
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0")
