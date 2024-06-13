@@ -109,7 +109,7 @@ class PostPage(ft.AlertDialog):
         
         if response.status_code == 201:
             print("投稿が完了しました！")
-            self.page.snack_bar.open = True
+            self.page.snack_bar.open = True # type: ignore
             self.reset_post()
             self.close_dlg(e)
             self.page.update() # type: ignore
