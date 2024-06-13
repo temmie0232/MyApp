@@ -95,7 +95,7 @@ def get_timeline():
         cursor.execute("""
             SELECT 
                 posts.post_id, 
-                users.user_id AS user_id,  -- usersテーブルのuser_idを取得
+                users.user_id AS user_id, 
                 posts.content, 
                 posts.created_at, 
                 posts.updated_at, 
@@ -108,6 +108,7 @@ def get_timeline():
             FROM posts
             JOIN users ON posts.user_id = users.id
             WHERE posts.is_deleted = 0
+            ORDER BY posts.created_at DESC 
         """)
 
         # 結果を取得
