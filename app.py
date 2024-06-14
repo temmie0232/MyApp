@@ -1,14 +1,24 @@
-from flask import Flask,session, request, jsonify
+from flask import Flask, session, request, jsonify
+import os
 import mysql.connector
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
 from datetime import datetime, timedelta
 
 app = Flask(__name__)
 
+# 各種画像の保存先フォルダを定義
+UPLOAD_FOLDER_ICONS = 'uploads/icons'
+UPLOAD_FOLDER_POSTS = 'uploads/posts'
+
+# フォルダが存在しない場合、作成する
+for folder in [UPLOAD_FOLDER_ICONS, UPLOAD_FOLDER_POSTS]:
+    if not os.path.exists(folder):
+        os.makedirs(folder)
+
 app.secret_key = "D3tvn426"
 app.config["SESSION_PERMANENT"] = True
 app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(minutes=60)  # 例: セッションの有効期限を60分に設定
-
 
 def connect_db():
     return mysql.connector.connect(
@@ -69,7 +79,7 @@ def login():
     try:
         cursor.execute("SELECT * FROM users WHERE email=%s", (email,))
         user_record = cursor.fetchone()
-        # デバック用
+        # デバッグ用
         print(f"Database returned: {user_record}")
         
     finally:
@@ -82,7 +92,6 @@ def login():
         return jsonify({"message": "Login successful!","user_id": user_id}), 200
     else:
         return jsonify({"message": "Invalid credentials"}), 401
-
 
 @app.route("/timeline", methods=["GET"])
 def get_timeline():
@@ -124,8 +133,6 @@ def get_timeline():
         cursor.close()
         connection.close()
 
-
-
 @app.route("/post", methods=["POST"])
 def create_post():
     data = request.get_json()
@@ -152,7 +159,7 @@ def create_post():
         values = (user_id, content, parent_post_id, media_url)
         
         # 実行
-        cursor.execute(query,values)
+        cursor.execute(query, values)
         connection.commit()
 
         return jsonify({"message": "Post created successfully!"}),201
@@ -177,9 +184,57 @@ def get_user_profile(user_id):
             return jsonify(user), 200
         else:
             return jsonify({"message": "User not found"}), 404
+        
     except mysql.connector.Error as err:
         print("Error: {}".format(err))
         return jsonify({"message": "Error fetching user data"}), 500
+    
+    finally:
+        cursor.close()
+        connection.close()
+
+@app.route('/update_user/<user_id>', methods=['POST'])
+def update_user_profile(user_id):
+    data = request.json  # JSONデータを取得
+    
+    # JSONからデータを取得
+    user_name = data.get("user_name")
+    bio = data.get("bio")
+    icon_url = data.get("icon_url")
+
+    # `user_name` と `bio` が提供されていない場合はデータベースから取得（バックアッププラン）
+    if not user_name or not bio:
+        connection = connect_db()
+        cursor = connection.cursor(dictionary=True)
+        try:
+            cursor.execute("SELECT user_name, bio FROM users WHERE id = %s", (user_id,))
+            user_record = cursor.fetchone()
+            if user_record:
+                user_name = user_name or user_record['user_name']
+                bio = bio or user_record['bio']
+            else:
+                return jsonify({"message": "User not found"}), 404
+        finally:
+            cursor.close()
+            connection.close()
+
+    # データベースに接続してユーザ情報を更新
+    connection = connect_db()
+    cursor = connection.cursor()
+    
+    try:
+        update_query = """
+            UPDATE users 
+            SET user_name = %s, bio = %s, icon_url = %s 
+            WHERE id = %s
+        """
+        cursor.execute(update_query, (user_name, bio, icon_url, user_id))
+        connection.commit()
+        
+        return jsonify({"message": "User updated successfully!", "icon_url": icon_url}), 200
+    except mysql.connector.Error as err:
+        print(f"Error updating user: {err}")
+        return jsonify({"message": "Error updating user data", "error": str(err)}), 500
     finally:
         cursor.close()
         connection.close()
