@@ -74,14 +74,17 @@ class ProfilePage(ft.Container):
     def create_user_info(self):
         return ft.Column(
             controls=[
-                ft.Text(f"ユーザー名: {self.user['user_name']}", size=20, weight=ft.FontWeight.BOLD),
-                ft.Text(f"ユーザーID: {self.user['user_id']}", size=16, weight=ft.FontWeight.NORMAL)
+                # ユーザ名
+                ft.Text(f"{self.user['user_name']}", size=24, weight=ft.FontWeight.BOLD),
+                # ユーザID
+                ft.Text(f"{self.user['user_id']}", size=14, color="#888888", weight=ft.FontWeight.NORMAL)
             ],
             alignment=ft.MainAxisAlignment.START,
         )
 
     def create_bio(self):
         return ft.Container(
+            # 自己紹介
             content=ft.Text(f"自己紹介: {self.user['bio']}", size=16, weight=ft.FontWeight.NORMAL),
             padding=ft.padding.all(10),
             border_radius=10,
@@ -89,17 +92,82 @@ class ProfilePage(ft.Container):
         )
 
     def create_account_info(self):
-        # `dateutil.parser` を使用して日付文字列をパース
         created_at = parser.parse(self.user['created_at'])
-        return ft.Text(f"アカウント作成日: {created_at.strftime('%Y-%m-%d')}", size=14, weight=ft.FontWeight.NORMAL)
+        # アカウント作成日
+        return ft.Text(f"アカウント作成日: {created_at.strftime('%Y-%m-%d')}", size=14, color="#888888", weight=ft.FontWeight.NORMAL)
 
     def create_edit_button(self):
         return ft.ElevatedButton(
             text="編集",
-            on_click=self.edit_profile,
+            on_click=self.show_edit_dialog,
             bgcolor="#1976d2",
             color="#ffffff",
         )
 
-    def edit_profile(self, e):
-        self.page.go(f"/profile/edit/{self.user['user_id']}")
+    def show_edit_dialog(self, e):
+        self.icon_input = ft.FilePicker(on_result=self.icon_selected)
+        self.page.overlay.append(self.icon_input)
+        
+        self.edit_user_name = ft.TextField(label="ユーザー名", bgcolor=ft.colors.WHITE, value=self.user['user_name'])
+        self.edit_bio = ft.TextField(label="自己紹介", multiline=True, bgcolor=ft.colors.WHITE, value=self.user['bio'])
+        
+        self.edit_dialog = ft.AlertDialog(
+            modal=True,
+            title=ft.Text("プロフィールを編集"),
+            content=ft.Column(
+                [
+                    ft.Text("アイコン画像をアップロード"),
+                    ft.ElevatedButton(text="ファイルを選択", on_click=lambda _: self.icon_input.pick_files(allow_multiple=False)),
+                    self.edit_user_name,
+                    self.edit_bio,
+                ],
+                spacing=20,
+                height=400,
+                width=300,
+            ),
+            actions=[
+                ft.TextButton("キャンセル", on_click=self.close_dialog),
+                ft.ElevatedButton("保存", on_click=self.save_profile)
+            ],
+            bgcolor="#f2ede7",
+            actions_alignment=ft.MainAxisAlignment.END,
+        )
+        self.page.dialog = self.edit_dialog
+        self.edit_dialog.open = True
+        self.page.update()
+
+    def icon_selected(self, e: ft.FilePickerResultEvent):
+        if e.files:
+            self.selected_icon_file = e.files[0]
+            print(f"Selected file: {self.selected_icon_file.name}")
+
+    def close_dialog(self, e):
+        self.edit_dialog.open = False
+        self.page.update()
+
+    def save_profile(self, e):
+        # 新しいデータを収集
+        new_user_name = self.edit_user_name.value
+        new_bio = self.edit_bio.value
+        
+        # 画像アップロードの処理（例として新しいURLを設定）
+        new_icon_url = "/path/to/new/icon.png"
+        if hasattr(self, 'selected_icon_file'):
+            new_icon_url = f"/uploads/icons/{self.selected_icon_file.name}"
+
+        # サーバーにデータを送信して更新
+        response = requests.post(f"http://localhost:5000/update_user/{self.user_id}", json={
+            "user_name": new_user_name,
+            "bio": new_bio,
+            "icon_url": new_icon_url
+        })
+        
+        if response.status_code == 200:
+            print(f"・{new_user_name}\n・{new_bio}\n・{new_icon_url}\nに更新しました")
+            self.user['user_name'] = new_user_name
+            self.user['bio'] = new_bio
+            self.user['icon_url'] = new_icon_url
+            self.display_user_profile()
+            self.close_dialog(e)
+        else:
+            print(f"Error updating profile: {response.text}")
