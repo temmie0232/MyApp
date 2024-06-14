@@ -23,7 +23,7 @@ class MainPage(ft.View):
         self.mascot = self.create_mascot()
         self.post_btn = self.create_post_btn()
         
-        self.post_page = self.create_post_page()
+        self.post_page = self.create_post_page()  # ダイアログインスタンスを作成
         
         self.rail = self.create_nav_rail()
         self.rail_container = ft.Container(content=self.rail, border_radius=20)
@@ -90,7 +90,7 @@ class MainPage(ft.View):
             2: NotificationsPage(self.page),
             3: MessagesPage(self.page),
             4: ChatPage(self.page),
-            5: ProfilePage(self.page,user_id=user_id),
+            5: ProfilePage(self.page, user_id=user_id),
             6: SettingsPage(self.page),
         }
     
@@ -133,7 +133,7 @@ class MainPage(ft.View):
                     icon = ft.icons.RATE_REVIEW_OUTLINED,
                     width = 40,
                     height = 40,
-                    on_click = self.show_post_page,
+                    on_click=self.show_post_page,
                     icon_color = "#000000",
                     icon_size = 25,
                     tooltip = "投稿する"),
@@ -150,17 +150,17 @@ class MainPage(ft.View):
 
     # PostPage のインスタンスを作成
     def create_post_page(self):
-        return PostPage
+        # PostPage クラスをインスタンス化する際に、self.page を渡す
+        return PostPage(self.page)
 
     # ダイアログを表示
     def show_post_page(self, e):
-        self.page.dialog = self.post_page  # type: ignore # ダイアログをページに設定
+        self.page.dialog = self.post_page  # ダイアログをページに設定
         self.post_page.open = True
-        self.page.update()  # type: ignore # ページを更新してダイアログを表示    # ダイアログを表示
+        self.page.update()  # ページを更新してダイアログを表示
 
     # ダイアログを閉じる
     def close_dlg(self, e):
         self.post_page.open = False
-        self.page.update()  # type: ignore # ページを更新してダイアログを閉じるo
-        
-    
+        self.page.update()  # ページを更新してダイアログを閉じる
+
