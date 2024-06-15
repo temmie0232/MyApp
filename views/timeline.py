@@ -37,11 +37,14 @@ class TimelinePage(ft.Container):
         return ft.Column([
             ft.Container(self.title, alignment=ft.alignment.center),
             ft.Container(ft.Divider(), alignment=ft.alignment.center),
-            ft.Container(
+            ft.Container(content=ft.Row([
+                ft.VerticalDivider(),
                 self.main_lv,
+                ft.VerticalDivider(),
+                ],alignment=ft.MainAxisAlignment.CENTER), # type: ignore
                 expand=True,
                 height=500,  # スクロールエリアの高さを指定
-                alignment=ft.alignment.center
+                alignment=ft.alignment.center,
             ),
         ],
             expand=True,
