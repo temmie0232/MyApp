@@ -151,23 +151,17 @@ class ProfilePage(ft.Container):
         new_user_name = self.edit_user_name.value
         new_bio = self.edit_bio.value
         
-        # 画像アップロードの処理（例として新しいURLを設定）
-        new_icon_url = "/path/to/new/icon.png"
-        if hasattr(self, 'selected_icon_file'):
-            new_icon_url = f"/uploads/icons/{self.selected_icon_file.name}"
-
-        # サーバーにデータを送信して更新
-        response = requests.post(f"http://localhost:5000/update_user/{self.any_user_id}", json={  # API URLを修正
+        data = {
             "user_name": new_user_name,
             "bio": new_bio,
-            "icon_url": new_icon_url
-        })
+        }
+        # サーバーにデータを送信して更新
+        response = requests.post(f"http://localhost:5000/update_user/{self.any_user_id}", json=data)
         
         if response.status_code == 200:
-            print(f"・{new_user_name}\n・{new_bio}\n・{new_icon_url}\nに更新しました")
+            print(f"・{new_user_name}\n・{new_bio}\nに更新しました")
             self.user['user_name'] = new_user_name
             self.user['bio'] = new_bio
-            self.user['icon_url'] = new_icon_url
             self.display_user_profile()
             self.close_dialog(e)
         else:

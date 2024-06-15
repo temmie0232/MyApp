@@ -193,21 +193,20 @@ def get_user_profile(any_user_id):  # 修正ポイント: user_idをany_user_id�
         cursor.close()
         connection.close()
 
-@app.route('/update_user/<any_user_id>', methods=['POST'])  # 修正ポイント: user_idをany_user_idに変更
-def update_user_profile(any_user_id):  # 修正ポイント: user_idをany_user_idに変更
+@app.route('/update_user/<any_user_id>', methods=['POST'])  
+def update_user_profile(any_user_id): 
     data = request.json  # JSONデータを取得
     
     # JSONからデータを取得
     user_name = data.get("user_name")
     bio = data.get("bio")
-    icon_url = data.get("icon_url")
 
-    # `user_name` と `bio` が提供されていない場合はデータベースから取得（バックアッププラン）
+    # `user_name` と `bio` が提供されていない場合はデータベースから取得
     if not user_name or not bio:
         connection = connect_db()
         cursor = connection.cursor(dictionary=True)
         try:
-            cursor.execute("SELECT user_name, bio FROM users WHERE any_user_id = %s", (any_user_id,))  # 修正ポイント: idをany_user_idに変更
+            cursor.execute("SELECT user_name, bio FROM users WHERE any_user_id = %s", (any_user_id,)) 
             user_record = cursor.fetchone()
             if user_record:
                 user_name = user_name or user_record['user_name']
@@ -225,13 +224,13 @@ def update_user_profile(any_user_id):  # 修正ポイント: user_idをany_user_
     try:
         update_query = """
             UPDATE users 
-            SET user_name = %s, bio = %s, icon_url = %s 
-            WHERE any_user_id = %s  # 修正ポイント: idをany_user_idに変更
+            SET user_name = %s, bio = %s
+            WHERE any_user_id = %s 
         """
-        cursor.execute(update_query, (user_name, bio, icon_url, any_user_id))  # 修正ポイント: user_idをany_user_idに変更
+        cursor.execute(update_query, (user_name, bio, any_user_id)) 
         connection.commit()
         
-        return jsonify({"message": "User updated successfully!", "icon_url": icon_url}), 200
+        return jsonify({"message": "User updated successfully!"}), 200
     except mysql.connector.Error as err:
         print(f"Error updating user: {err}")
         return jsonify({"message": "Error updating user data", "error": str(err)}), 500
