@@ -268,7 +268,7 @@ class SignupStep2(ft.View):
 
     def register(self, e):
         user_name = self.regist_user_name.value
-        any_user_id = "@" + self.regist_any_user_id.value.lstrip("@") # type: ignore
+        any_user_id = self.regist_any_user_id.value # type: ignore
         email = self.page.session.get("email") # type: ignore
         password = self.page.session.get("password") # type: ignore
         email_opt_in = self.page.session.get("email_opt_in") # type: ignore
