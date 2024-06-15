@@ -119,20 +119,25 @@ class ProfilePage(ft.Container):
         
         self.edit_user_name = ft.TextField(label="ユーザー名", bgcolor=ft.colors.WHITE, value=self.user['user_name'])
         self.edit_bio = ft.TextField(label="自己紹介", multiline=True, bgcolor=ft.colors.WHITE, value=self.user['bio'])
+
+        self.upload_status_container = ft.Row(controls=[])
         
         self.edit_dialog = ft.AlertDialog(
             modal=True,
-            title=ft.Text("プロフィールを編集"),
+            title=ft.Column([ft.Text("プロフィールを編集")],horizontal_alignment=ft.CrossAxisAlignment.CENTER,),
             content=ft.Column(
                 [
+                    ft.Divider(),
                     ft.Text("アイコン画像をアップロード"),
-                    ft.ElevatedButton(text="ファイルを選択", on_click=lambda _: self.icon_input.pick_files(allow_multiple=False)),
+                    ft.ElevatedButton(text="ファイルを選択", on_click=lambda _: self.icon_input.pick_files(allow_multiple=False,file_type=ft.FilePickerFileType.IMAGE)),
+                    self.upload_status_container,
+                    ft.Divider(),
                     self.edit_user_name,
                     self.edit_bio,
                 ],
-                spacing=20,
                 height=400,
                 width=300,
+                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
             ),
             actions=[
                 ft.TextButton("キャンセル", on_click=self.close_dialog),
@@ -163,6 +168,20 @@ class ProfilePage(ft.Container):
 
                 # 保存されたファイルパスを保持
                 self.user['icon_path'] = save_path
+
+                # 緑のチェックマークとファイル名を表示
+                self.upload_status_container.controls.clear()
+                self.upload_status_container.controls.append(
+                    ft.Row(
+                        [
+                            ft.Icon(name=ft.icons.CHECK_CIRCLE_OUTLINE, color=ft.colors.GREEN),
+                            ft.Text(selected_file.name, size=12, color="#888888", weight=ft.FontWeight.NORMAL),
+                        ],
+                        spacing=10,
+                    )
+                )
+                self.page.update()
+                
             else:
                 print(f"ファイルのアップロード中にエラーが発生しました: {response.text}")
 
