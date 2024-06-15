@@ -61,7 +61,7 @@ class ProfilePage(ft.Container):
     def create_profile_image(self):
         return ft.Container(
             content=ft.Image(
-                src=self.user.get('icon_url', '/path/to/default/icon.png'),  # デフォルトの画像パスを指定
+                src=self.user.get('icon_path', 'uploads/icons/default/icon.png'),  # デフォルトの画像パスを指定
                 fit=ft.ImageFit.CONTAIN,
                 width=100,
                 height=100,
@@ -78,7 +78,7 @@ class ProfilePage(ft.Container):
                 # ユーザ名
                 ft.Text(f"{self.user['user_name']}", size=24, weight=ft.FontWeight.BOLD),
                 # ユーザID
-                ft.Text(f"{self.user['any_user_id']}", size=14, color="#888888", weight=ft.FontWeight.NORMAL)  # user_id を any_user_id に変更
+                ft.Text(f"{self.user['any_user_id']}", size=14, color="#888888", weight=ft.FontWeight.NORMAL)  
             ],
             alignment=ft.MainAxisAlignment.START,
         )

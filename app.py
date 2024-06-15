@@ -170,14 +170,14 @@ def create_post():
         cursor.close()
         connection.close()
 
-@app.route('/user/<any_user_id>', methods=['GET'])  # 修正ポイント: user_idをany_user_idに変更
-def get_user_profile(any_user_id):  # 修正ポイント: user_idをany_user_idに変更
+@app.route('/user/<any_user_id>', methods=['GET']) 
+def get_user_profile(any_user_id): 
     connection = connect_db()
     cursor = connection.cursor(dictionary=True)
     
     try:
-        query = "SELECT any_user_id, user_name, icon_url, bio, created_at FROM users WHERE any_user_id = %s"  # 修正ポイント: idをany_user_idに変更
-        cursor.execute(query, (any_user_id,))  # 修正ポイント: user_idをany_user_idに変更
+        query = "SELECT any_user_id, user_name, icon_path, bio, created_at FROM users WHERE any_user_id = %s"  
+        cursor.execute(query, (any_user_id,))  
         user = cursor.fetchone()
         
         if user:
