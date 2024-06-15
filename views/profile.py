@@ -59,7 +59,7 @@ class ProfilePage(ft.Container):
         # コンテナに要素を追加
         self.content.controls.clear()
         self.content.controls.extend([
-            self.profile_image,
+            #self.profile_image,
             self.user_info,
             self.bio,
             self.account_info,
@@ -128,7 +128,7 @@ class ProfilePage(ft.Container):
             content=ft.Column(
                 [
                     ft.Divider(),
-                    ft.Text("アイコン画像をアップロード"),
+                    ft.Text("アイコン画像をアップロード\n(この機能はまだ実装してないです)"),
                     ft.ElevatedButton(text="ファイルを選択", on_click=lambda _: self.icon_input.pick_files(allow_multiple=False,file_type=ft.FilePickerFileType.IMAGE)),
                     self.upload_status_container,
                     ft.Divider(),
@@ -150,6 +150,8 @@ class ProfilePage(ft.Container):
         self.edit_dialog.open = True
         self.page.update()
         
+    
+    # 未実装
     def icon_selected(self, e: ft.FilePickerResultEvent):
         if e.files:
             selected_file = e.files[0]
@@ -184,6 +186,7 @@ class ProfilePage(ft.Container):
                 
             else:
                 print(f"ファイルのアップロード中にエラーが発生しました: {response.text}")
+                
 
     def close_dialog(self, e):
         self.edit_dialog.open = False
