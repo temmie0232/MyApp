@@ -1,3 +1,5 @@
+import os
+import shutil
 import time
 import flet as ft
 import requests
@@ -5,28 +7,34 @@ from datetime import datetime
 from dateutil import parser
 
 class ProfilePage(ft.Container):
-    def __init__(self, page, any_user_id):  # user_id を any_user_id に変更
+    def __init__(self, page, any_user_id): 
         super().__init__()
 
         self.page = page
-        self.any_user_id = any_user_id  # user_id を any_user_id に変更
+        self.any_user_id = any_user_id 
         self.user = None
+        self.selected_icon_file = None  # アイコンファイルのリファレンスを保持
         self.padding = 20
         self.bgcolor = "#f2ede7"
         self.border_radius = 20
-        self.expand = True
+        self.expand = True        
+        self.page.snack_bar = ft.SnackBar(content=ft.Text("プロフィールを更新しました！"), action="OK")
 
-        print(f"ProfilePage initialized with any_user_id: {self.any_user_id}")  # 出力メッセージも修正
+        print(f"ProfilePage が any_user_id<{self.any_user_id}> で初期化されました") 
 
         # 初期状態では空のコンテンツを設定
         self.content = ft.Column(spacing=20, alignment=ft.MainAxisAlignment.START)
+        
+        # FilePickerの設定
+        self.icon_input = ft.FilePicker(on_result=self.icon_selected)
+        self.page.overlay.append(self.icon_input)
         
         # ユーザーデータをロード
         self.load_user_data()
 
     def load_user_data(self):
         try:
-            response = requests.get(f"http://localhost:5000/user/{self.any_user_id}")  # API URLも修正
+            response = requests.get(f"http://localhost:5000/user/{self.any_user_id}") 
             if response.status_code == 200:
                 self.user = response.json()
                 self.display_user_profile()
@@ -76,9 +84,9 @@ class ProfilePage(ft.Container):
         return ft.Column(
             controls=[
                 # ユーザ名
-                ft.Text(f"{self.user['user_name']}", size=24, weight=ft.FontWeight.BOLD),
+                ft.Text(f"{self.user['user_name']}", size=28, weight=ft.FontWeight.BOLD),
                 # ユーザID
-                ft.Text(f"{self.user['any_user_id']}", size=14, color="#888888", weight=ft.FontWeight.NORMAL)  
+                ft.Text(f"@{self.user['any_user_id']}", size=14, color="#888888", weight=ft.FontWeight.NORMAL)  
             ],
             alignment=ft.MainAxisAlignment.START,
         )
@@ -86,7 +94,7 @@ class ProfilePage(ft.Container):
     def create_bio(self):
         return ft.Container(
             # 自己紹介
-            content=ft.Text(f"自己紹介: {self.user['bio']}", size=16, weight=ft.FontWeight.NORMAL),
+            content=ft.Text(f"{self.user['bio']}", size=16, weight=ft.FontWeight.NORMAL),
             padding=ft.padding.all(10),
             border_radius=10,
             bgcolor="#ffffff"
@@ -136,33 +144,51 @@ class ProfilePage(ft.Container):
         self.page.dialog = self.edit_dialog
         self.edit_dialog.open = True
         self.page.update()
-
+        
     def icon_selected(self, e: ft.FilePickerResultEvent):
         if e.files:
-            self.selected_icon_file = e.files[0]
-            print(f"Selected file: {self.selected_icon_file.name}")
+            selected_file = e.files[0]
+            print(f"選択されたファイル: {selected_file.name}")
+
+            # ファイルのアップロード
+            path = f"http://localhost:5000/upload_icon/{self.any_user_id}"
+            files = {'file': (selected_file.name, selected_file.size)}
+
+            response = requests.post(path, files=files)
+
+            if response.status_code == 200:
+                # サーバー側で保存されたファイルのパスを取得
+                save_path = response.json().get('save_path')
+                print(f"ファイルが保存されました: {save_path}")
+
+                # 保存されたファイルパスを保持
+                self.user['icon_path'] = save_path
+            else:
+                print(f"ファイルのアップロード中にエラーが発生しました: {response.text}")
 
     def close_dialog(self, e):
         self.edit_dialog.open = False
         self.page.update()
 
     def save_profile(self, e):
-        # 新しいデータを収集
         new_user_name = self.edit_user_name.value
         new_bio = self.edit_bio.value
-        
+
         data = {
             "user_name": new_user_name,
             "bio": new_bio,
+            "icon_path": self.user.get('icon_path')  
         }
-        # サーバーにデータを送信して更新
+
         response = requests.post(f"http://localhost:5000/update_user/{self.any_user_id}", json=data)
-        
+
         if response.status_code == 200:
-            print(f"・{new_user_name}\n・{new_bio}\nに更新しました")
+            print(f"・{new_user_name}\n・{new_bio}\n・{self.user['icon_path']}\nに更新しました")
             self.user['user_name'] = new_user_name
             self.user['bio'] = new_bio
             self.display_user_profile()
+            self.page.snack_bar.open = True # type: ignore
             self.close_dialog(e)
+            self.page.update() # type: ignore
         else:
-            print(f"Error updating profile: {response.text}")
+            print(f"ファイルの更新中にエラーが発生しました: {response.text}")
