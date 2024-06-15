@@ -166,7 +166,7 @@ class SignupStep2(ft.View):
             max_length=20,
         )
 
-        self.regist_user_id = ft.TextField(
+        self.regist_any_user_id = ft.TextField(
             label="ユーザーID",
             hint_text="例 : yuta2525",
             width=310,
@@ -235,7 +235,7 @@ class SignupStep2(ft.View):
                         ft.Divider(color="grey", height=8),
                         ft.Container(height=2),
                         self.regist_user_name,
-                        self.regist_user_id,
+                        self.regist_any_user_id,
                         ft.Container(height=1),
                         self.date_btn,
                         ft.Container(height=1),
@@ -257,10 +257,10 @@ class SignupStep2(ft.View):
     def validate_step2_form(self, e):
         valid = (
             1 <= len(self.regist_user_name.value) <= 20 # type: ignore
-            and 1 <= len(self.regist_user_id.value) <= 20 # type: ignore
+            and 1 <= len(self.regist_any_user_id.value) <= 20 # type: ignore
             and self.date_picker.value.strftime("%Y-%m-%d") # type: ignore
             != datetime.date.today().strftime("%Y-%m-%d")
-            and self.regist_user_id.value.replace("_", "").isalnum() # type: ignore
+            and self.regist_any_user_id.value.replace("_", "").isalnum() # type: ignore
         )
 
         self.regist_btn.disabled = not valid
@@ -268,7 +268,7 @@ class SignupStep2(ft.View):
 
     def register(self, e):
         user_name = self.regist_user_name.value
-        user_id ="@" + self.regist_user_id.value.lstrip("@") # type: ignore
+        any_user_id = self.regist_any_user_id.value # type: ignore
         email = self.page.session.get("email") # type: ignore
         password = self.page.session.get("password") # type: ignore
         email_opt_in = self.page.session.get("email_opt_in") # type: ignore
@@ -280,7 +280,7 @@ class SignupStep2(ft.View):
             "http://127.0.0.1:5000/register",
             json={
                 "user_name": user_name,
-                "user_id": user_id,
+                "any_user_id": any_user_id,
                 "email": email,
                 "password": password,
                 "email_opt_in": email_opt_in,
@@ -309,7 +309,7 @@ class SignupStep2(ft.View):
 
         if not (1 <= len(self.regist_user_name.value) <= 20): # type: ignore
             errors.append("・表示名は1文字以上20文字以下にしてください")
-        if not (1 <= len(self.regist_user_id.value) <= 20 and self.regist_user_id.value.replace("_", "").isalnum()): # type: ignore
+        if not (1 <= len(self.regist_any_user_id.value) <= 20 and self.regist_any_user_id.value.replace("_", "").isalnum()): # type: ignore
             errors.append("・ユーザーIDは英数字とアンダーバーのみ、1文字以上20文字以下にしてください")
         if self.date_picker.value.strftime("%Y-%m-%d") == datetime.date.today().strftime("%Y-%m-%d"): # type: ignore
             errors.append("・正しい生年月日を入力してください")

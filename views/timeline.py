@@ -1,7 +1,8 @@
+import time
 import flet as ft
 import requests
 import datetime
-import pytz # タイムゾーンのサポート
+import pytz  # タイムゾーンのサポート
 
 
 class TimelinePage(ft.Container):
@@ -21,15 +22,15 @@ class TimelinePage(ft.Container):
         self.content = self.create_main_layout()
 
         # 過去の投稿を取得して表示
-        self.load_posts()        # すべての初期化が完了した後に呼び出す
+        self.load_posts()  # すべての初期化が完了した後に呼び出す
 
         # 初期化完了後に呼び出し
         self.page.update()
 
     # UIの初期化
     def initialize_ui(self):
-        self.title = ft.Text("タイムライン", size = 28, weight = "w800") # type: ignore
-        self.main_lv= ft.Column(spacing=10, scroll=ft.ScrollMode.AUTO)
+        self.title = ft.Text("タイムライン", size=28, weight="w800")  # type: ignore
+        self.main_lv = ft.Column(spacing=10, scroll=ft.ScrollMode.AUTO)
 
     # UIの配置
     def create_main_layout(self):
@@ -37,16 +38,16 @@ class TimelinePage(ft.Container):
             ft.Container(self.title, alignment=ft.alignment.center),
             ft.Container(ft.Divider(), alignment=ft.alignment.center),
             ft.Container(
-                self.main_lv, 
-                expand=True, 
+                self.main_lv,
+                expand=True,
                 height=500,  # スクロールエリアの高さを指定
                 alignment=ft.alignment.center
             ),
         ],
-        expand=True,
-        alignment=ft.MainAxisAlignment.CENTER,
-        horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-    )
+            expand=True,
+            alignment=ft.MainAxisAlignment.CENTER,
+            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+        )
     
     def load_posts(self):
         # データベースから投稿を取得するエンドポイントへのリクエストを作成
@@ -60,13 +61,14 @@ class TimelinePage(ft.Container):
                 post_container = PostContainer(post)
                 # ListViewにコンテナ(インスタンス)を追加
                 self.main_lv.controls.append(post_container)
-            self.page.update() # type: ignore
+            self.page.update()  # type: ignore
         else:
             print("投稿を取得できませんでした")
             
+
 # 投稿のコンポーネント
 class PostContainer(ft.Container):
-    def __init__(self,post_data):
+    def __init__(self, post_data):
         super().__init__()
         
         self.padding = 10
@@ -74,9 +76,9 @@ class PostContainer(ft.Container):
         self.border_radius = 10
 
         # 外側左右25,上下5
-        self.margin = ft.margin.only(25,5,25,5)
+        self.margin = ft.margin.only(25, 5, 25, 5)
         # 内側
-        self.padding = ft.padding.only(20,20,20,10)        
+        self.padding = ft.padding.only(20, 20, 20, 10)        
 
         self.width = 500
         
@@ -86,7 +88,7 @@ class PostContainer(ft.Container):
     def create_ui(self, post_data):
         # post_dataを使い、各投稿の内容を表示するUIを構築
         user_name = post_data.get("user_name")
-        user_id = post_data.get("user_id")
+        any_user_id = post_data.get("any_user_id")  # user_id を any_user_id に変更
         content = post_data.get("content")
         created_at_str = post_data.get("created_at")
         
@@ -100,29 +102,29 @@ class PostContainer(ft.Container):
         time_display = self.format_time_diff(created_at, now)
 
         # ユーザー情報部分
-        user_info = ft.Row([ft.Text(f"{user_name}",weight="bold"),ft.Text(f"{user_id} ",color="#888888"),ft.Text(time_display)]) # type: ignore
+        user_info = ft.Row([ft.Text(f"{user_name}", weight="bold"), ft.Text(f"{any_user_id} ", color="#888888"), ft.Text(time_display)])  # type: ignore
 
         # 下部のアイコン部分
         action_bar = ft.Container(
             content=ft.Row([
-                    ft.IconButton(icon=ft.icons.REPLY_OUTLINED, tooltip="返信", icon_size=18, icon_color=ft.colors.BLACK),
-                    ft.IconButton(icon=ft.icons.SYNC, tooltip="リポスト", selected_icon=ft.icons.SYNC, icon_size=18, icon_color=ft.colors.BLACK, selected_icon_color="#00ba7c", selected=False, on_click=self.toggle_icon_button),
-                    ft.IconButton(icon=ft.icons.FAVORITE_BORDER, selected_icon=ft.icons.FAVORITE, tooltip="いいね", icon_size=18, icon_color=ft.colors.BLACK, selected_icon_color="#f91880", selected=False, on_click=self.toggle_icon_button),
+                ft.IconButton(icon=ft.icons.REPLY_OUTLINED, tooltip="返信", icon_size=18, icon_color=ft.colors.BLACK),
+                ft.IconButton(icon=ft.icons.SYNC, tooltip="リポスト", selected_icon=ft.icons.SYNC, icon_size=18, icon_color=ft.colors.BLACK, selected_icon_color="#00ba7c", selected=False, on_click=self.toggle_icon_button),
+                ft.IconButton(icon=ft.icons.FAVORITE_BORDER, selected_icon=ft.icons.FAVORITE, tooltip="いいね", icon_size=18, icon_color=ft.colors.BLACK, selected_icon_color="#f91880", selected=False, on_click=self.toggle_icon_button),
             ],
-            height=29),
+                height=29),
         )
         
         # スペース用コンテナ
         divider = ft.Container(height=10)
         
         self.content = ft.Column([
-                ft.Container(content=user_info), # type: ignore
-                divider,
-                ft.Text(f"{content}",max_lines=5),
-                divider,
-                ft.Divider(thickness=0.6,height=4),
-                action_bar,
-            ],
+            ft.Container(content=user_info),  # type: ignore
+            divider,
+            ft.Text(f"{content}", max_lines=5),
+            divider,
+            ft.Divider(thickness=0.6, height=4),
+            action_bar,
+        ],
             spacing=5,
         )
         
@@ -150,6 +152,6 @@ class PostContainer(ft.Container):
         else:
             return "たった今"
         
-    def toggle_icon_button(self,e):
+    def toggle_icon_button(self, e):
         e.control.selected = not e.control.selected
         e.control.update()
