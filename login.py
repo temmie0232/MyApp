@@ -90,12 +90,12 @@ class Login(ft.View):
             # サーバーからのレスポンスを確認
             print(f"Server response data: {user_data}")
             # ユーザーIDを取得
-            user_id = user_data.get("user_id")
-            
+            any_user_id = user_data.get("any_user_id")  # 修正ポイント
+
             # ユーザーIDをセッションに保存
-            if user_id:
-                self.page.session.set("user_id", user_id) # type: ignore
-                print(f"Logged in user_id: {user_id}")  # デバッグ用
+            if any_user_id:
+                self.page.session.set("any_user_id", any_user_id)  # 修正ポイント
+                print(f"Logged in any_user_id: {any_user_id}")  # デバッグ用
                 self.page.go("/home")  # type: ignore
             else:
                 print("ユーザーIDが取得できませんでした。")

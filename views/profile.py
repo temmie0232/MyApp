@@ -1,21 +1,22 @@
+import time
 import flet as ft
 import requests
 from datetime import datetime
 from dateutil import parser
 
 class ProfilePage(ft.Container):
-    def __init__(self, page, user_id):
+    def __init__(self, page, any_user_id):  # user_id を any_user_id に変更
         super().__init__()
 
         self.page = page
-        self.user_id = user_id
+        self.any_user_id = any_user_id  # user_id を any_user_id に変更
         self.user = None
         self.padding = 20
         self.bgcolor = "#f2ede7"
         self.border_radius = 20
         self.expand = True
 
-        print(f"ProfilePage initialized with user_id: {self.user_id}")
+        print(f"ProfilePage initialized with any_user_id: {self.any_user_id}")  # 出力メッセージも修正
 
         # 初期状態では空のコンテンツを設定
         self.content = ft.Column(spacing=20, alignment=ft.MainAxisAlignment.START)
@@ -25,7 +26,7 @@ class ProfilePage(ft.Container):
 
     def load_user_data(self):
         try:
-            response = requests.get(f"http://localhost:5000/user/{self.user_id}")
+            response = requests.get(f"http://localhost:5000/user/{self.any_user_id}")  # API URLも修正
             if response.status_code == 200:
                 self.user = response.json()
                 self.display_user_profile()
@@ -77,7 +78,7 @@ class ProfilePage(ft.Container):
                 # ユーザ名
                 ft.Text(f"{self.user['user_name']}", size=24, weight=ft.FontWeight.BOLD),
                 # ユーザID
-                ft.Text(f"{self.user['user_id']}", size=14, color="#888888", weight=ft.FontWeight.NORMAL)
+                ft.Text(f"{self.user['any_user_id']}", size=14, color="#888888", weight=ft.FontWeight.NORMAL)  # user_id を any_user_id に変更
             ],
             alignment=ft.MainAxisAlignment.START,
         )
@@ -156,7 +157,7 @@ class ProfilePage(ft.Container):
             new_icon_url = f"/uploads/icons/{self.selected_icon_file.name}"
 
         # サーバーにデータを送信して更新
-        response = requests.post(f"http://localhost:5000/update_user/{self.user_id}", json={
+        response = requests.post(f"http://localhost:5000/update_user/{self.any_user_id}", json={  # API URLを修正
             "user_name": new_user_name,
             "bio": new_bio,
             "icon_url": new_icon_url

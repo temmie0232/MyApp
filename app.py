@@ -39,7 +39,7 @@ def home():
 def register():
     data = request.get_json()
 
-    user_id = data.get("user_id")
+    any_user_id = data.get("any_user_id")  # 修正ポイント: user_idをany_user_idに変更
     user_name = data.get("user_name")
     email = data.get("email")
     password = data.get("password")
@@ -54,9 +54,9 @@ def register():
     
     try:
         cursor.execute("""
-            INSERT INTO users (user_name, user_id, email, password, email_opt_in, birth_date, created_at) 
+            INSERT INTO users (user_name, any_user_id, email, password, email_opt_in, birth_date, created_at) 
             VALUES (%s, %s, %s, %s, %s, %s, %s)
-        """, (user_name, user_id, email, hashed_password, email_opt_in, birth_date, created_at))
+        """, (user_name, any_user_id, email, hashed_password, email_opt_in, birth_date, created_at))
         connection.commit()
         return jsonify({"message": "User registered successfully!"}), 201
     except mysql.connector.Error as err:
@@ -87,9 +87,9 @@ def login():
         connection.close()
 
     if user_record and check_password_hash(user_record[4], password): # type: ignore
-        user_id = user_record[0] # type: ignore
-        session["user_id"] = user_id
-        return jsonify({"message": "Login successful!","user_id": user_id}), 200
+        any_user_id = user_record[1]  # 修正ポイント: user_idをany_user_idに変更
+        session["any_user_id"] = any_user_id  # セッションに保存するキーを変更
+        return jsonify({"message": "Login successful!", "any_user_id": any_user_id}), 200  # 修正ポイント: user_idをany_user_idに変更
     else:
         return jsonify({"message": "Invalid credentials"}), 401
 
@@ -104,7 +104,7 @@ def get_timeline():
         cursor.execute("""
             SELECT 
                 posts.post_id, 
-                users.user_id AS user_id, 
+                users.any_user_id AS any_user_id,  # 修正ポイント: user_idをany_user_idに変更
                 posts.content, 
                 posts.created_at, 
                 posts.updated_at, 
@@ -115,7 +115,7 @@ def get_timeline():
                 posts.media_url, 
                 users.user_name
             FROM posts
-            JOIN users ON posts.user_id = users.id
+            JOIN users ON posts.user_id = users.user_id  # usersテーブルのフィールド名も修正
             WHERE posts.is_deleted = 0
             ORDER BY posts.created_at DESC 
         """)
@@ -137,12 +137,12 @@ def get_timeline():
 def create_post():
     data = request.get_json()
     
-    user_id = data.get("user_id")
+    any_user_id = data.get("any_user_id")  # 修正ポイント: user_idをany_user_idに変更
     content = data.get("content")
     parent_post_id = data.get("parent_post_id")
     media_url = data.get("media_url")
 
-    if not user_id or not content:
+    if not any_user_id or not content:  # 修正ポイント: user_idをany_user_idに変更
         return jsonify({"message": "User ID and content are required"}), 400
     
     connection = connect_db()
@@ -151,18 +151,18 @@ def create_post():
     try:
         # SQLクエリの構築
         query = """
-            INSERT INTO posts (user_id,content,parent_post_id,media_url)
-            VALUES (%s,%s,%s,%s)
+            INSERT INTO posts (user_id, content, parent_post_id, media_url)
+            VALUES (%s, %s, %s, %s)
         """
 
         # 値をタプルとして準備
-        values = (user_id, content, parent_post_id, media_url)
+        values = (any_user_id, content, parent_post_id, media_url)  # 修正ポイント: user_idをany_user_idに変更
         
         # 実行
         cursor.execute(query, values)
         connection.commit()
 
-        return jsonify({"message": "Post created successfully!"}),201
+        return jsonify({"message": "Post created successfully!"}), 201
     except mysql.connector.Error as err:
         print("Something went wrong: {}".format(err))
         return jsonify({"message": "Post creation failed", "error": str(err)}), 500
@@ -170,14 +170,14 @@ def create_post():
         cursor.close()
         connection.close()
 
-@app.route('/user/<user_id>', methods=['GET'])
-def get_user_profile(user_id):
+@app.route('/user/<any_user_id>', methods=['GET'])  # 修正ポイント: user_idをany_user_idに変更
+def get_user_profile(any_user_id):  # 修正ポイント: user_idをany_user_idに変更
     connection = connect_db()
     cursor = connection.cursor(dictionary=True)
     
     try:
-        query = "SELECT user_id, user_name, icon_url, bio, created_at FROM users WHERE id = %s"
-        cursor.execute(query, (user_id,))
+        query = "SELECT any_user_id, user_name, icon_url, bio, created_at FROM users WHERE any_user_id = %s"  # 修正ポイント: idをany_user_idに変更
+        cursor.execute(query, (any_user_id,))  # 修正ポイント: user_idをany_user_idに変更
         user = cursor.fetchone()
         
         if user:
@@ -193,8 +193,8 @@ def get_user_profile(user_id):
         cursor.close()
         connection.close()
 
-@app.route('/update_user/<user_id>', methods=['POST'])
-def update_user_profile(user_id):
+@app.route('/update_user/<any_user_id>', methods=['POST'])  # 修正ポイント: user_idをany_user_idに変更
+def update_user_profile(any_user_id):  # 修正ポイント: user_idをany_user_idに変更
     data = request.json  # JSONデータを取得
     
     # JSONからデータを取得
@@ -207,7 +207,7 @@ def update_user_profile(user_id):
         connection = connect_db()
         cursor = connection.cursor(dictionary=True)
         try:
-            cursor.execute("SELECT user_name, bio FROM users WHERE id = %s", (user_id,))
+            cursor.execute("SELECT user_name, bio FROM users WHERE any_user_id = %s", (any_user_id,))  # 修正ポイント: idをany_user_idに変更
             user_record = cursor.fetchone()
             if user_record:
                 user_name = user_name or user_record['user_name']
@@ -226,9 +226,9 @@ def update_user_profile(user_id):
         update_query = """
             UPDATE users 
             SET user_name = %s, bio = %s, icon_url = %s 
-            WHERE id = %s
+            WHERE any_user_id = %s  # 修正ポイント: idをany_user_idに変更
         """
-        cursor.execute(update_query, (user_name, bio, icon_url, user_id))
+        cursor.execute(update_query, (user_name, bio, icon_url, any_user_id))  # 修正ポイント: user_idをany_user_idに変更
         connection.commit()
         
         return jsonify({"message": "User updated successfully!", "icon_url": icon_url}), 200

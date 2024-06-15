@@ -52,11 +52,11 @@ class MainPage(ft.View):
             ft.NavigationRailDestination(
                 icon_content=ft.Container(
                     content=ft.Icon(dest["icon"], size=27),
-                    padding=ft.padding.only(bottom=5,top=5)
+                    padding=ft.padding.only(bottom=5, top=5)
                 ),
                 selected_icon_content=ft.Container(
                     content=ft.Icon(dest["selected_icon"], size=27),
-                    padding=ft.padding.only(bottom=5,top=5)
+                    padding=ft.padding.only(bottom=5, top=5)
                 ),
                 label=dest["label"],
             ) for dest in destinations
@@ -78,19 +78,19 @@ class MainPage(ft.View):
     
     def init_views(self):
         # セッションからユーザーIDを取得
-        user_id = self.page.session.get("user_id") 
+        any_user_id = self.page.session.get("any_user_id")  # user_idをany_user_idに変更
 
-        if user_id is None:
+        if any_user_id is None:
             self.page.go("/login")
-            return{}
-        
+            return {}
+
         return {
             0: TimelinePage(self.page),
             1: SearchPage(self.page),
             2: NotificationsPage(self.page),
             3: MessagesPage(self.page),
             4: ChatPage(self.page),
-            5: ProfilePage(self.page, user_id=user_id),
+            5: ProfilePage(self.page, any_user_id=any_user_id),  # user_idをany_user_idに変更
             6: SettingsPage(self.page),
         }
     
@@ -114,31 +114,31 @@ class MainPage(ft.View):
 
     def create_mascot(self):
         return ft.Container(
-            content = ft.IconButton(
+            content=ft.IconButton(
                 content=ft.Image(
                     src=f"/images/1_64.png",
                     fit=ft.ImageFit.FILL,
-                    width = 50,
-                    height = 50,
+                    width=50,
+                    height=50,
                 ),
             ),
-            padding=ft.margin.only(top=15) # type: ignore
+            padding=ft.margin.only(top=15)  # type: ignore
         )    
     
     def create_post_btn(self):
         return ft.Container(
-            content = ft.Column([
+            content=ft.Column([
                 ft.Container(height=5),
                 ft.Container(ft.IconButton(
-                    icon = ft.icons.RATE_REVIEW_OUTLINED,
-                    width = 40,
-                    height = 40,
+                    icon=ft.icons.RATE_REVIEW_OUTLINED,
+                    width=40,
+                    height=40,
                     on_click=self.show_post_page,
-                    icon_color = "#000000",
-                    icon_size = 25,
-                    tooltip = "投稿する"),
-                bgcolor = "#f2ede7",
-                border = ft.border.all(2, ft.colors.BLACK),
+                    icon_color="#000000",
+                    icon_size=25,
+                    tooltip="投稿する"),
+                bgcolor="#f2ede7",
+                border=ft.border.all(2, ft.colors.BLACK),
                 border_radius=ft.border_radius.all(10)),
             ])
         )
@@ -163,4 +163,3 @@ class MainPage(ft.View):
     def close_dlg(self, e):
         self.post_page.open = False
         self.page.update()  # ページを更新してダイアログを閉じる
-

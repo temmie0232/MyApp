@@ -2,6 +2,7 @@ import flet as ft
 from login import Login
 from signup import SignupStep1, SignupStep2
 from home import MainPage
+from views.profile import ProfilePage  # ProfilePageをインポート
 
 def main(page: ft.Page) -> None:
     print("プログラムが開始しました")
@@ -18,25 +19,25 @@ def main(page: ft.Page) -> None:
             login = Login(page)
             page.views.append(login)
 
-        if page.route == "/signup":
+        elif page.route == "/signup":
             print(f"{route} に移動しました")
             signup1 = SignupStep1(page)
             page.views.append(signup1)
 
-        if page.route == "/signup/2":
+        elif page.route == "/signup/2":
             print(f"{route} に移動しました")
             signup2 = SignupStep2(page)
             page.views.append(signup2)
 
-        if page.route == "/home":
+        elif page.route == "/home":
             print(f"{route} に移動しました")
             mainpage = MainPage(page)
             page.views.append(mainpage)
 
-        if page.route.startswith("/profile"):
-            user_id = page.route.split("/")[-1]
-            print(f"{route} に移動しました - ユーザーID: {user_id}")
-            profile_page = ProfilePage(page, user_id=user_id)
+        elif page.route.startswith("/profile"):
+            any_user_id = page.route.split("/")[-1]
+            print(f"{route} に移動しました - ユーザーID: {any_user_id}")
+            profile_page = ProfilePage(page, any_user_id=any_user_id)  # user_idをany_user_idに変更
             page.views.append(profile_page)
 
         page.update()
@@ -77,3 +78,4 @@ if __name__ == "__main__":
         port=44444,
         host="0.0.0.0"
     )
+
