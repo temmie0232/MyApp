@@ -96,6 +96,35 @@ def login():
         return jsonify({"message": "ログインに成功しました！", "any_user_id": any_user_id}), 200  
     else:
         return jsonify({"message": "認証情報が無効です"}), 401
+    
+@app.route('/users', methods=['GET'])
+def get_all_users():
+    connection = connect_db()
+    cursor = connection.cursor(dictionary=True)
+
+    try:
+        # ユーザー情報を取得する
+        query = """
+            SELECT 
+                any_user_id,
+                user_name,
+                icon_path,
+                bio,
+                created_at
+            FROM users
+        """
+        cursor.execute(query)
+        users = cursor.fetchall()
+
+        return jsonify(users), 200
+
+    except mysql.connector.Error as err:
+        print("問題が発生しました: {}".format(err))
+        return jsonify({"message": "ユーザー情報の取得に失敗しました", "error": str(err)}), 500
+
+    finally:
+        cursor.close()
+        connection.close()
 
 @app.route("/timeline", methods=["GET"])
 def get_timeline():
@@ -104,7 +133,7 @@ def get_timeline():
     cursor = connection.cursor(dictionary=True)
 
     try:
-        # 投稿を取得するクエリ
+        # 投稿を取得する
         cursor.execute("""
             SELECT 
                 posts.post_id, 
