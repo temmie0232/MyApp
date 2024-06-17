@@ -30,13 +30,13 @@ def main(page: ft.Page) -> None:
             page.views.append(signup2)
 
         elif page.route == "/home":
-            print(f" /home/ に移動しました")
+            print(f" /home に移動しました")
             mainpage = MainPage(page)
             page.views.append(mainpage)
 
         elif page.route.startswith("/profile"): 
             any_user_id = page.route.split("/")[-1] 
-            print(f" /profike に移動しました - ユーザーID: {any_user_id}")
+            print(f" /profile に移動しました - ユーザーID: {any_user_id}")
             profile_page = ProfilePage(page, any_user_id=any_user_id)  # user_idをany_user_idに変更
             page.views.append(profile_page) 
 
