@@ -32,7 +32,7 @@ class ProfilePage(ft.Container):
         self.account_info = ft.Text()
         self.edit_button = ft.ElevatedButton()
 
-        self.reload_button = ft.IconButton(icon=ft.icons.REFRESH, on_click=self.reload_posts)
+        self.reload_button = ft.IconButton(icon=ft.icons.REFRESH, icon_color="#42474e",on_click=self.reload_posts)
         
         self.title = ft.Container(
             content=ft.Text("過去の投稿", size=28, weight="w800"),
@@ -97,6 +97,13 @@ class ProfilePage(ft.Container):
             width=400,
             height=350,
             alignment=ft.alignment.center,  
+            shadow=ft.BoxShadow(
+                spread_radius=0,
+                blur_radius=5,
+                color=ft.colors.GREY_500,
+                offset=ft.Offset(0, 2),
+                blur_style=ft.ShadowBlurStyle.OUTER,
+            )
         )
 
     def setup_file_picker(self):
@@ -149,7 +156,7 @@ class ProfilePage(ft.Container):
     def create_profile_image(self):
         """プロフィール画像コンポーネントを作成する"""
         return ft.Container(
-            content=ft.Icon(name=ft.icons.ACCOUNT_CIRCLE, size=100),
+            content=ft.Icon(name=ft.icons.ACCOUNT_CIRCLE, size=100, color="#42474e"),
             alignment=ft.alignment.center
         )
 
@@ -181,11 +188,10 @@ class ProfilePage(ft.Container):
 
     def create_edit_button(self):
         """編集ボタンを作成"""
-        return ft.ElevatedButton(
+        return ft.OutlinedButton(
             text="編集",
             on_click=self.show_edit_dialog,
-            bgcolor="#1976d2",
-            color="#ffffff",
+            style=ft.ButtonStyle(color=ft.colors.BLACK,overlay_color="#e2e2e2")
         )
 
     def show_edit_dialog(self, e):
