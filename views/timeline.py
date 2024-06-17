@@ -30,7 +30,7 @@ class TimelinePage(ft.Container):
 
     # UIの初期化
     def initialize_ui(self):
-        self.reload_button = ft.IconButton(icon=ft.icons.REFRESH, on_click=self.reload_posts)
+        self.reload_button = ft.IconButton(icon=ft.icons.REFRESH,icon_color="#43474e", on_click=self.reload_posts)
 
         self.title = ft.Text("タイムライン", size=28, weight="w800")  
         self.main_lv = ft.Column(spacing=10, scroll=ft.ScrollMode.AUTO)
