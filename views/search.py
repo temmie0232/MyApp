@@ -1,6 +1,7 @@
 import flet as ft
 import requests
 from component.postcard import PostCard
+from component.usercard import UserCard
 
 class SearchPage(ft.Container):
     def __init__(self, page):
@@ -12,41 +13,58 @@ class SearchPage(ft.Container):
         self.border_radius = 20
         self.expand = True
         
+        # 検索ターゲットのフラグを初期化
+        self.search_target_post = True  # デフォルトで投稿がTrue
+        self.search_target_user = False
+
         # UIの初期化
         self.initialize_ui()
         
         # UIを画面に配置
         self.content = self.create_main_layout()
 
-        # 過去の投稿を取得して表示
-        self.load_posts()  # すべての初期化が完了した後に呼び出す
+        # 初期のデータをロード
+        self.all_posts = []
+        self.all_users = []
+        self.load_initial_data()
 
-        # 初期化完了後に呼び出し
+        # 初期化完了後に更新
         self.page.update()
 
-    # UIの初期化
     def initialize_ui(self):
-        self.reload_button = ft.IconButton(icon=ft.icons.REFRESH,icon_color="#43474e",  on_click=self.reload_posts)
+        """UIの要素を初期化"""
+        self.reload_button = self.create_reload_button()
+        self.search_field = self.create_search_field()
+        self.popup_menu = self.create_popup_menu()
+        self.top_bar = self.create_top_bar()
+        self.main_lv = self.create_main_lv()
 
-        # 初期の検索モードは "投稿"
-        self.mode = "投稿"
-        
-        # 検索バーの初期化
-        self.search_field = ft.SearchBar(
+    def create_reload_button(self):
+        """リロードボタンを作成"""
+        return ft.IconButton(
+            icon=ft.icons.REFRESH,
+            icon_color="#43474e",
+            on_click=self.reload_posts
+        )
+
+    def create_search_field(self):
+        """検索バーを作成"""
+        return ft.SearchBar(
             bar_hint_text="検索...",
             bar_bgcolor=ft.colors.WHITE,
             bar_overlay_color=ft.colors.WHITE,
             view_bgcolor=ft.colors.WHITE,
             view_surface_tint_color=ft.colors.WHITE,
-            width=400
+            width=400,
+            on_change=self.on_search_change  # 変更イベントを監視
         )
-        
-        # スイッチとラベルの初期化
-        self.pb = ft.PopupMenuButton(
+
+    def create_popup_menu(self):
+        """ポップアップメニューを作成"""
+        return ft.PopupMenuButton(
             items=[
-                ft.PopupMenuItem(text="検索対象 : ユーザー", checked=False, on_click=self.check_item_clicked),
-                ft.PopupMenuItem(text="検索対象 : 投稿", checked=False, on_click=self.check_item_clicked),
-                
+                ft.PopupMenuItem(text="検索対象 : 投稿", checked=self.search_target_post, on_click=self.check_post_item_clicked),
+                ft.PopupMenuItem(text="検索対象 : ユーザー", checked=self.search_target_user, on_click=self.check_user_item_clicked),
             ],
             icon_color=ft.colors.BLACK45,
             icon=ft.icons.SETTINGS_APPLICATIONS,
@@ -54,14 +72,15 @@ class SearchPage(ft.Container):
             bgcolor=ft.colors.WHITE,
             surface_tint_color=ft.colors.WHITE
         )
-        
-        # トップバーのUI
-        self.top_bar = ft.Row(
+
+    def create_top_bar(self):
+        """トップバーを作成"""
+        return ft.Row(
             [
                 ft.Container(
                     ft.Row(
                         [
-                            self.pb,
+                            self.popup_menu,
                             self.search_field,
                             self.reload_button,
                         ],
@@ -74,10 +93,12 @@ class SearchPage(ft.Container):
             vertical_alignment=ft.CrossAxisAlignment.START
         )
 
-        self.main_lv = ft.Column(spacing=10, scroll=ft.ScrollMode.AUTO)
+    def create_main_lv(self):
+        """メインリストビューを作成"""
+        return ft.Column(spacing=10, scroll=ft.ScrollMode.AUTO)
 
-    # UIの配置
     def create_main_layout(self):
+        """メインレイアウトの作成"""
         return ft.Column([
             ft.Container(self.top_bar, alignment=ft.alignment.center),
             ft.Container(ft.Divider(), alignment=ft.alignment.center),
@@ -85,40 +106,91 @@ class SearchPage(ft.Container):
                 ft.VerticalDivider(),
                 self.main_lv,
                 ft.VerticalDivider(),
-                ],alignment=ft.MainAxisAlignment.CENTER), 
-                expand=True,
-                height=500,  # スクロールエリアの高さを指定
-                alignment=ft.alignment.center,
-            ),
-        ],
+            ], alignment=ft.MainAxisAlignment.CENTER), 
             expand=True,
-            alignment=ft.MainAxisAlignment.CENTER,
-            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+            height=500,
+            alignment=ft.alignment.center),
+        ],
+        expand=True,
+        alignment=ft.MainAxisAlignment.CENTER,
+        horizontal_alignment=ft.CrossAxisAlignment.CENTER,
         )
 
+    def load_initial_data(self):
+        """初期データをロードする"""
+        # 投稿データをロード
+        self.load_posts()
+        # ユーザーデータをロード
+        self.load_users()
 
-        
     def load_posts(self):
-        # データベースから投稿を取得するエンドポイントへのリクエストを作成
+        """投稿データをロードする"""
         response = requests.get("http://localhost:5000/timeline")
         
         if response.status_code == 200:
             print("投稿を取得しました")
-            posts = response.json()
-            for post in posts:
-                # インスタンスを作成
-                post_container = PostCard(post)
-                # ListViewにコンテナ(インスタンス)を追加
-                self.main_lv.controls.append(post_container)
-            self.page.update()  
+            self.all_posts = response.json()
+            self.display_filtered_data()
         else:
             print("投稿を取得できませんでした")
-            
-    # 投稿をリロードするメソッド
-    def reload_posts(self, e):
-        self.main_lv.controls.clear()  # 現在の投稿をクリア
-        self.load_posts()  # 再度投稿を読み込む
 
-    def check_item_clicked(self,e):
-        e.control.checked = not e.control.checked
+    def load_users(self):
+        """ユーザーデータをロードする"""
+        response = requests.get("http://localhost:5000/users")
+        
+        if response.status_code == 200:
+            print("ユーザーを取得しました")
+            self.all_users = response.json()
+            self.display_filtered_data()
+        else:
+            print("ユーザーを取得できませんでした")
+
+    def reload_posts(self, e):
+        """投稿をリロードする"""
+        self.load_posts()
+
+    def check_post_item_clicked(self, e):
+        """投稿検索クリックハンドリング"""
+        self.search_target_post = not self.search_target_post
+        if self.search_target_post:
+            self.search_target_user = False  # 投稿が選択されたらユーザーをアンチェック
+        self.update_popup_menu()
+
+    def check_user_item_clicked(self, e):
+        """ユーザー検索クリックハンドリング"""
+        self.search_target_user = not self.search_target_user
+        if self.search_target_user:
+            self.search_target_post = False  # ユーザーが選択されたら投稿をアンチェック
+        self.update_popup_menu()
+
+    def update_popup_menu(self):
+        """ポップアップメニューの状態を更新"""
+        for item in self.popup_menu.items: # type: ignore
+            if item.text == "検索対象 : 投稿":
+                item.checked = self.search_target_post
+            elif item.text == "検索対象 : ユーザー":
+                item.checked = self.search_target_user
+        self.page.update()
+
+    def on_search_change(self, e):
+        """検索バーの変更イベントをハンドル"""
+        self.display_filtered_data()
+
+    def display_filtered_data(self):
+        """検索フィールドの内容に基づいてフィルタリングされたデータを表示 (バックエンド側でフィルタリングしたほうがいい？)"""
+        keyword = self.search_field.value.lower()
+        self.main_lv.controls.clear()
+
+        if self.search_target_post:
+            filtered_posts = [post for post in self.all_posts if keyword in post['content'].lower()]
+            for post in filtered_posts:
+                post_container = PostCard(post)
+                self.main_lv.controls.append(post_container)
+
+        elif self.search_target_user:
+            filtered_users = [user for user in self.all_users if keyword in user['any_user_id'].lower()]
+            for user in filtered_users:
+                user_container = UserCard(user)
+                self.main_lv.controls.append(user_container)
+
         self.page.update()
