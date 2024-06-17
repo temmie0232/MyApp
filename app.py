@@ -16,7 +16,7 @@ for folder in [UPLOAD_FOLDER_ICONS, UPLOAD_FOLDER_POSTS]:
     if not os.path.exists(folder):
         os.makedirs(folder)
 
-app.secret_key = "D3tvn426"
+app.secret_key = os.environ.get("SECRET_KEY", "default_secret_key") 
 app.config["SESSION_PERMANENT"] = True
 app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(minutes=60)  # 例: セッションの有効期限を60分に設定
 
@@ -143,7 +143,18 @@ def get_user_posts(any_user_id):
     cursor = connection.cursor(dictionary=True)
 
     try:
-        query = """
+        # まず、any_user_id に対応する user_id を取得する
+        user_query = "SELECT user_id FROM users WHERE any_user_id = %s"
+        cursor.execute(user_query, (any_user_id,))
+        user = cursor.fetchone()
+
+        if not user:
+            return jsonify({"message": "ユーザーが見つかりません"}), 404
+
+        user_id = user['user_id']
+
+        # 次に、その user_id を使用してユーザーの投稿を取得する
+        posts_query = """
             SELECT 
                 posts.post_id, 
                 posts.content, 
@@ -153,12 +164,15 @@ def get_user_posts(any_user_id):
                 posts.repost_count, 
                 posts.replies_count, 
                 posts.parent_post_id, 
-                posts.media_url
+                posts.media_url,
+                users.user_name,
+                users.any_user_id
             FROM posts
+            JOIN users ON posts.user_id = users.user_id
             WHERE posts.user_id = %s AND posts.is_deleted = 0
             ORDER BY posts.created_at DESC
         """
-        cursor.execute(query, (any_user_id,))
+        cursor.execute(posts_query, (user_id,))
         posts = cursor.fetchall()
 
         return jsonify(posts), 200
@@ -168,7 +182,7 @@ def get_user_posts(any_user_id):
     finally:
         cursor.close()
         connection.close()
-
+        
 @app.route("/post", methods=["POST"])
 def create_post():
     data = request.get_json()
@@ -185,6 +199,15 @@ def create_post():
     cursor = connection.cursor()
 
     try:
+        # user_idを取得するためのクエリを追加
+        cursor.execute("SELECT user_id FROM users WHERE any_user_id = %s", (any_user_id,))
+        user_record = cursor.fetchone()
+        
+        if not user_record:
+            return jsonify({"message": "無効なユーザーID"}), 400
+        
+        user_id = user_record[0]
+
         # SQLクエリの構築
         query = """
             INSERT INTO posts (user_id, content, parent_post_id, media_url)
@@ -192,7 +215,7 @@ def create_post():
         """
 
         # 値をタプルとして準備
-        values = (any_user_id, content, parent_post_id, media_url) 
+        values = (user_id, content, parent_post_id, media_url) 
         
         # 実行
         cursor.execute(query, values)
@@ -205,7 +228,6 @@ def create_post():
     finally:
         cursor.close()
         connection.close()
-
 @app.route('/user/<any_user_id>', methods=['GET']) 
 def get_user_profile(any_user_id): 
     connection = connect_db()
@@ -300,6 +322,7 @@ def update_user_profile(any_user_id):
     finally:
         cursor.close()
         connection.close()
+
 
 
 if __name__ == "__main__":
