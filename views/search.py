@@ -40,6 +40,9 @@ class SearchPage(ft.Container):
         self.top_bar = self.create_top_bar()
         self.main_lv = self.create_main_lv()
 
+        # 初期ラベルの設定
+        self.update_search_label()
+
     def create_reload_button(self):
         """リロードボタンを作成"""
         return ft.IconButton(
@@ -50,12 +53,16 @@ class SearchPage(ft.Container):
 
     def create_search_field(self):
         """検索バーを作成"""
-        return ft.SearchBar(
-            bar_hint_text="検索...",
-            bar_bgcolor=ft.colors.WHITE,
-            bar_overlay_color=ft.colors.WHITE,
-            view_bgcolor=ft.colors.WHITE,
-            view_surface_tint_color=ft.colors.WHITE,
+        return ft.TextField(
+            label="XXを検索",
+            hint_text="検索...",
+            border_color=ft.colors.BLACK,
+            cursor_color=ft.colors.BLACK,
+            cursor_width=2,
+            border_width=1,
+            focused_border_width=2,
+            border_radius=5,
+            color=ft.colors.WHITE,
             width=400,
             on_change=self.on_search_change  # 変更イベントを監視
         )
@@ -160,6 +167,9 @@ class SearchPage(ft.Container):
         # バナーを表示
         update_banner(self.page, message="検索対象が '投稿' に設定されました", action_text="OK")
 
+        # ラベルを更新
+        self.update_search_label()
+
     def check_user_item_clicked(self, e):
         """ユーザー検索クリックハンドリング"""
         self.search_target_user = not self.search_target_user
@@ -170,6 +180,9 @@ class SearchPage(ft.Container):
         # バナーを表示
         update_banner(self.page, message="検索対象が 'ユーザー' に設定されました", action_text="OK")
 
+        # ラベルを更新
+        self.update_search_label()
+
     def update_popup_menu(self):
         """ポップアップメニューの状態を更新"""
         for item in self.popup_menu.items: # type: ignore
@@ -177,6 +190,16 @@ class SearchPage(ft.Container):
                 item.checked = self.search_target_post
             elif item.text == "検索対象 : ユーザー":
                 item.checked = self.search_target_user
+        self.page.update()
+
+    def update_search_label(self):
+        """検索バーのラベルを更新"""
+        if self.search_target_post:
+            self.search_field.label = "投稿を検索"
+        elif self.search_target_user:
+            self.search_field.label = "ユーザーを検索"
+        else:
+            self.search_field.label = "左のアイコンから検索条件を指定"
         self.page.update()
 
     def on_search_change(self, e):
