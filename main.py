@@ -15,28 +15,28 @@ def main(page: ft.Page) -> None:
         page.views.clear()
         
         if page.route == "/" or page.route == "/login":
-            print(f"{route} に移動しました")
+            print(f" / に移動しました")
             login = Login(page)
             page.views.append(login)
 
         elif page.route == "/signup":
-            print(f"{route} に移動しました")
+            print(f" /signup に移動しました")
             signup1 = SignupStep1(page)
             page.views.append(signup1)
 
         elif page.route == "/signup/2":
-            print(f"{route} に移動しました")
+            print(f" /signup/2 に移動しました")
             signup2 = SignupStep2(page)
             page.views.append(signup2)
 
         elif page.route == "/home":
-            print(f"{route} に移動しました")
+            print(f" /home/ に移動しました")
             mainpage = MainPage(page)
             page.views.append(mainpage)
 
         elif page.route.startswith("/profile"): 
             any_user_id = page.route.split("/")[-1] 
-            print(f"{route} に移動しました - ユーザーID: {any_user_id}")
+            print(f" /profike に移動しました - ユーザーID: {any_user_id}")
             profile_page = ProfilePage(page, any_user_id=any_user_id)  # user_idをany_user_idに変更
             page.views.append(profile_page) 
 
