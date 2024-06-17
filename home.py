@@ -82,7 +82,7 @@ class MainPage(ft.View):
 
     def init_views(self):
         """各ページのビューを初期化"""
-        any_user_id = self.page.session.get("any_user_id")  # セッションからユーザーIDを取得
+        any_user_id = self.page.session.get("any_user_id")  
 
         if any_user_id is None:
             self.page.go("/login")
@@ -129,7 +129,7 @@ class MainPage(ft.View):
                     height=50,
                 ),
             ),
-            padding=ft.margin.only(top=15)  # type: ignore
+            padding=ft.margin.only(top=15) 
         )
 
     def create_post_button(self):
@@ -161,9 +161,9 @@ class MainPage(ft.View):
         """ダイアログを表示"""
         self.page.dialog = self.post_page
         self.post_page.open = True
-        self.page.update()
+        self.page.update() 
 
     def close_dialog(self, e):
         """ダイアログを閉じる"""
         self.post_page.open = False
-        self.page.update()
+        self.page.update() 

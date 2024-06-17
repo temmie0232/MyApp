@@ -83,8 +83,8 @@ class Login(ft.View):
 
     def validate_login_form(self, e):
         """ログインフォームのバリデーション"""
-        self.login_btn.disabled = not (self.input_username.value and self.input_password.value) # type: ignore
-        self.page.update()  # type: ignore
+        self.login_btn.disabled = not (self.input_username.value and self.input_password.value) 
+        self.page.update()  
 
     def handle_login(self, e):
         """ログイン処理"""
@@ -100,9 +100,9 @@ class Login(ft.View):
 
                 any_user_id = user_data.get("any_user_id")
                 if any_user_id:
-                    self.page.session.set("any_user_id", any_user_id)  # セッションにユーザーIDを保存
+                    self.page.session.set("any_user_id", any_user_id)  # セッションにユーザーIDを保存 #type: ignore
                     print(f"Logged in any_user_id: {any_user_id}")
-                    self.page.go("/home")  # type: ignore
+                    self.page.go("/home")  
                 else:
                     self.show_error("ユーザーIDが取得できませんでした。")
 
@@ -113,19 +113,19 @@ class Login(ft.View):
 
     def handle_register(self, e):
         """新規登録ページに遷移"""
-        self.page.go("/signup")  # type: ignore
+        self.page.go("/signup")  
 
     def show_error(self, message):
         """エラーメッセージの表示"""
         self.dlg_message.content = ft.Text(message)
         self.dlg_message.open = True
-        self.page.dialog = self.dlg_message  # type: ignore
-        self.page.update()  # type: ignore
+        self.page.dialog = self.dlg_message  
+        self.page.update()  
 
     def close_error_dialog(self, e):
         """エラーダイアログを閉じる"""
         self.dlg_message.open = False
-        self.page.update()  # type: ignore
+        self.page.update()  
 
 
 if __name__ == "__main__":

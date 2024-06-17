@@ -60,21 +60,21 @@ class PostPage(ft.AlertDialog):
     def close_dialog(self, e):
         """ダイアログを閉じる"""
         self.open = False
-        self.page.update()  # type: ignore
+        self.page.update()  
 
     def reset_post(self):
         """投稿フィールドをリセット"""
         self.text_field.value = ""  # テキストフィールドを空白にする
         self.update_text_count(0)
-        self.page.update()  # type: ignore
+        self.page.update()  
 
     def check_text_length(self, e):
         """投稿内容の文字数をチェック"""
-        length = len(self.text_field.value)  # type: ignore
+        length = len(self.text_field.value)  
         self.update_text_count(length)
         
-        self.post_btn.disabled = length > 200  # type: ignore
-        self.page.update()  # type: ignore
+        self.post_btn.disabled = length > 200  
+        self.page.update()  
             
     def update_text_count(self, length):
         """文字数カウンターを更新"""
@@ -82,18 +82,18 @@ class PostPage(ft.AlertDialog):
         if length > 200:
             self.text_count.color = ft.colors.RED
             self.text_count.weight = ft.FontWeight.BOLD
-            self.post_btn.tooltip = "文字数がオーバーしています"  # type: ignore
+            self.post_btn.tooltip = "文字数がオーバーしています"  
         else:
             self.text_count.color = ft.colors.BLACK
             self.text_count.weight = ft.FontWeight.NORMAL
-            self.post_btn.tooltip = "投稿する"  # type: ignore
+            self.post_btn.tooltip = "投稿する"  
         
-        self.page.update()  # type: ignore
+        self.page.update()  
     
     def submit_post(self, e):
         """投稿をサーバーに送信"""
         content = self.text_field.value
-        any_user_id = self.page.session.get("any_user_id")  # type: ignore
+        any_user_id = self.page.session.get("any_user_id")  
 
         if any_user_id is None:
             print("このセッションでユーザーIDが使用できません")
@@ -105,9 +105,9 @@ class PostPage(ft.AlertDialog):
         
         if response.status_code == 201:
             print("投稿が完了しました！")
-            self.page.snack_bar.open = True  # type: ignore
+            self.page.snack_bar.open = True  
             self.reset_post()
             self.close_dialog(e)
-            self.page.update()  # type: ignore
+            self.page.update()  
         else:
             print("投稿に失敗しました。")

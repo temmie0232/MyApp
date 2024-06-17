@@ -217,8 +217,8 @@ class ProfilePage(ft.Container):
             self.user['user_name'] = new_user_name
             self.user['bio'] = new_bio
             self.display_user_profile()
-            self.page.snack_bar.open = True # type: ignore
+            self.page.snack_bar.open = True 
             self.close_dialog(e)
-            self.page.update() # type: ignore
+            self.page.update() 
         else:
             print(f"ファイルの更新中にエラーが発生しました: {response.text}")

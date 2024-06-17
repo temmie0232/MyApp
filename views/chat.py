@@ -23,7 +23,7 @@ class ChatPage(ft.Container):
 
     def initialize_ui(self):
         """UIの初期化"""
-        self.title = ft.Text("会話してみる", size=28, weight="w800")  # type: ignore
+        self.title = ft.Text("会話してみる", size=28, weight="w800")  
         self.chat_display = ChatContentDisplay()
         self.prompt = PromptField(self.chat_display.list_view)
 
@@ -88,7 +88,7 @@ class PromptField(ft.TextField):
         self.chat_list_view.update()
 
         for char in prompt:
-            msg.controls[1].value += char  # メッセージのテキストを更新
+            msg.controls[1].value += char   # メッセージのテキストを更新
             self.chat_list_view.update()
             time.sleep(0.016)
 
@@ -106,7 +106,7 @@ class PromptField(ft.TextField):
             ]
         )
         response_text = completion.choices[0].message.content
-        self.animate_text_output(name="^^)", prompt=response_text)  # type: ignore
+        self.animate_text_output(name="^^)", prompt=response_text)  
 
     def run_prompt(self, event) -> None:
         """プロンプトを実行"""

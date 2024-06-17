@@ -34,11 +34,11 @@ def main(page: ft.Page) -> None:
             mainpage = MainPage(page)
             page.views.append(mainpage)
 
-        elif page.route.startswith("/profile"):
-            any_user_id = page.route.split("/")[-1]
+        elif page.route.startswith("/profile"): 
+            any_user_id = page.route.split("/")[-1] 
             print(f"{route} に移動しました - ユーザーID: {any_user_id}")
             profile_page = ProfilePage(page, any_user_id=any_user_id)  # user_idをany_user_idに変更
-            page.views.append(profile_page)
+            page.views.append(profile_page) 
 
         page.update()
     

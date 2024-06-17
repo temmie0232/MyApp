@@ -98,32 +98,32 @@ class SignupStep1(ft.View):
     def validate_step1_form(self, e):
         """フォームのバリデーション"""
         valid = (
-            self.regist_mail.value.count("@") == 1  # type: ignore
-            and self.regist_mail.value.count(".") > 0  # type: ignore
-            and 6 <= len(self.regist_pass.value) <= 20  # type: ignore
-            and self.regist_pass.value.isalnum()  # type: ignore
-            and self.regist_pass.value == self.regist_pass_confirm.value  # type: ignore
+            self.regist_mail.value.count("@") == 1  
+            and self.regist_mail.value.count(".") > 0  
+            and 6 <= len(self.regist_pass.value) <= 20  
+            and self.regist_pass.value.isalnum()  
+            and self.regist_pass.value == self.regist_pass_confirm.value  
         )
         self.next_btn.disabled = not valid
-        self.page.update()  # type: ignore
+        self.page.update()  
 
     def go_to_step2(self, e):
         """STEP2に進む"""
-        self.page.session.set("email", self.regist_mail.value)  # type: ignore
-        self.page.session.set("password", self.regist_pass.value)  # type: ignore
-        self.page.session.set("email_opt_in", int(self.check_mail_wrap.controls[0].value))  # type: ignore
-        self.page.go("/signup/2")  # type: ignore
+        self.page.session.set("email", self.regist_mail.value)  
+        self.page.session.set("password", self.regist_pass.value)  
+        self.page.session.set("email_opt_in", int(self.check_mail_wrap.controls[0].value))  
+        self.page.go("/signup/2")  
 
     def show_step1_help(self, e):
         """STEP1のヘルプを表示"""
         errors = []
-        if self.regist_mail.value.count("@") != 1 or self.regist_mail.value.count(".") == 0:  # type: ignore
+        if self.regist_mail.value.count("@") != 1 or self.regist_mail.value.count(".") == 0:  
             errors.append("・メールアドレスの形式が正しくありません。")
-        if not (6 <= len(self.regist_pass.value) <= 20):  # type: ignore
+        if not (6 <= len(self.regist_pass.value) <= 20):  
             errors.append("・パスワードは6文字以上20文字以下にしてください。")
-        if not self.regist_pass.value.isalnum():  # type: ignore
+        if not self.regist_pass.value.isalnum():  
             errors.append("・パスワードは英数字のみ使用できます。")
-        if self.regist_pass.value != self.regist_pass_confirm.value:  # type: ignore
+        if self.regist_pass.value != self.regist_pass_confirm.value:  
             errors.append("・再入力のパスワードが一致していません。")
 
         if errors:
@@ -131,14 +131,14 @@ class SignupStep1(ft.View):
         else:
             self.dlg_modal.content = ft.Text("すべての条件を満たしています！")
 
-        self.page.dialog = self.dlg_modal  # type: ignore
+        self.page.dialog = self.dlg_modal  
         self.dlg_modal.open = True
-        self.page.update()  # type: ignore
+        self.page.update()  
 
     def close_error_dialog(self, e):
         """エラーダイアログを閉じる"""
         self.dlg_modal.open = False
-        self.page.update()  # type: ignore
+        self.page.update()  
 
 
 class SignupStep2(ft.View):
@@ -189,15 +189,15 @@ class SignupStep2(ft.View):
         date_picker = ft.DatePicker(
             first_date=datetime.datetime(1900, 1, 1),
             last_date=datetime.datetime(2050, 1, 1),
-            date_picker_entry_mode="INPUT",  # type: ignore
+            date_picker_entry_mode="INPUT",  
             field_label_text="生年月日を入力 (mm/dd/yyyy)",
             error_format_text="mm/dd/yyyy の形で入力してください",
             error_invalid_text="選択された日付は範囲外です",
             field_hint_text="例 : 12/31/2000",
-            value=datetime.date.today(),  # type: ignore
+            value=datetime.date.today(),  
             on_change=self.validate_step2_form,
         )
-        self.page.overlay.append(date_picker)
+        self.page.overlay.append(date_picker) 
         return date_picker
 
     def create_alert_dialog(self, title, on_click):
@@ -256,25 +256,25 @@ class SignupStep2(ft.View):
     def validate_step2_form(self, e):
         """フォームのバリデーション"""
         valid = (
-            1 <= len(self.regist_user_name.value) <= 20  # type: ignore
-            and 1 <= len(self.regist_any_user_id.value) <= 20  # type: ignore
-            and self.date_picker.value.strftime("%Y-%m-%d")  # type: ignore
+            1 <= len(self.regist_user_name.value) <= 20  
+            and 1 <= len(self.regist_any_user_id.value) <= 20  
+            and self.date_picker.value.strftime("%Y-%m-%d")  
             != datetime.date.today().strftime("%Y-%m-%d")
-            and self.regist_any_user_id.value.replace("_", "").isalnum()  # type: ignore
+            and self.regist_any_user_id.value.replace("_", "").isalnum()  
         )
         self.regist_btn.disabled = not valid
-        self.page.update()  # type: ignore
+        self.page.update()  
 
     def register(self, e):
         """登録処理"""
         user_name = self.regist_user_name.value
-        any_user_id = self.regist_any_user_id.value  # type: ignore
-        email = self.page.session.get("email")  # type: ignore
-        password = self.page.session.get("password")  # type: ignore
-        email_opt_in = self.page.session.get("email_opt_in")  # type: ignore
+        any_user_id = self.regist_any_user_id.value  
+        email = self.page.session.get("email")  
+        password = self.page.session.get("password")  
+        email_opt_in = self.page.session.get("email_opt_in")  
         birth_date = self.date_picker.value
 
-        birth_date_str = birth_date.strftime("%Y-%m-%d")  # type: ignore
+        birth_date_str = birth_date.strftime("%Y-%m-%d")  
 
         response = requests.post(
             "http://127.0.0.1:5000/register",
@@ -291,28 +291,28 @@ class SignupStep2(ft.View):
         if response.status_code == 201:
             self.dlg_success.content = ft.Text("登録に成功しました！")
             self.dlg_success.open = True
-            self.page.dialog = self.dlg_success  # type: ignore
-            self.page.update()  # type: ignore
+            self.page.dialog = self.dlg_success  
+            self.page.update()  
         else:
             try:
                 error_message = response.json().get("error", "Unknown error")
-            except json.JSONDecodeError:  # type: ignore
+            except json.JSONDecodeError:  
                 error_message = "サーバーからの無効な応答"
 
             self.dlg_message.content = ft.Text(f"登録に失敗しました。エラー: {error_message}")
             self.dlg_message.open = True
-            self.page.dialog = self.dlg_message  # type: ignore
-            self.page.update()  # type: ignore
+            self.page.dialog = self.dlg_message  
+            self.page.update()  
 
     def show_step2_help(self, e):
         """STEP2のヘルプを表示"""
         errors = []
 
-        if not (1 <= len(self.regist_user_name.value) <= 20):  # type: ignore
+        if not (1 <= len(self.regist_user_name.value) <= 20):  
             errors.append("・表示名は1文字以上20文字以下にしてください")
-        if not (1 <= len(self.regist_any_user_id.value) <= 20 and self.regist_any_user_id.value.replace("_", "").isalnum()):  # type: ignore
+        if not (1 <= len(self.regist_any_user_id.value) <= 20 and self.regist_any_user_id.value.replace("_", "").isalnum()):  
             errors.append("・ユーザーIDは英数字とアンダーバーのみ、1文字以上20文字以下にしてください")
-        if self.date_picker.value.strftime("%Y-%m-%d") == datetime.date.today().strftime("%Y-%m-%d"):  # type: ignore
+        if self.date_picker.value.strftime("%Y-%m-%d") == datetime.date.today().strftime("%Y-%m-%d"):  
             errors.append("・正しい生年月日を入力してください")
 
         if errors:
@@ -320,20 +320,20 @@ class SignupStep2(ft.View):
         else:
             self.dlg_message.content = ft.Text("すべての条件を満たしています！")
 
-        self.page.dialog = self.dlg_message  # type: ignore
+        self.page.dialog = self.dlg_message  
         self.dlg_message.open = True
-        self.page.update()  # type: ignore
+        self.page.update()  
 
     def close_success_dialog(self, e):
         """成功ダイアログを閉じる"""
         self.dlg_success.open = False
-        self.page.update()  # type: ignore
-        self.page.go("/login")  # type: ignore
+        self.page.update()  
+        self.page.go("/login")  
 
     def close_error_dialog(self, e):
         """エラーダイアログを閉じる"""
         self.dlg_message.open = False
-        self.page.update()  # type: ignore
+        self.page.update()  
 
 
 if __name__ == "__main__":

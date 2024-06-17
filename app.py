@@ -90,7 +90,7 @@ def login():
         cursor.close()
         connection.close()
 
-    if user_record and check_password_hash(user_record[4], password): # type: ignore
+    if user_record and check_password_hash(user_record[4], password): 
         any_user_id = user_record[1] 
         session["any_user_id"] = any_user_id  # セッションに保存するキーを変更
         return jsonify({"message": "ログインに成功しました！", "any_user_id": any_user_id}), 200  

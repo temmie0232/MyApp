@@ -29,7 +29,7 @@ class TimelinePage(ft.Container):
 
     # UIの初期化
     def initialize_ui(self):
-        self.title = ft.Text("タイムライン", size=28, weight="w800")  # type: ignore
+        self.title = ft.Text("タイムライン", size=28, weight="w800")  
         self.main_lv = ft.Column(spacing=10, scroll=ft.ScrollMode.AUTO)
 
     # UIの配置
@@ -41,7 +41,7 @@ class TimelinePage(ft.Container):
                 ft.VerticalDivider(),
                 self.main_lv,
                 ft.VerticalDivider(),
-                ],alignment=ft.MainAxisAlignment.CENTER), # type: ignore
+                ],alignment=ft.MainAxisAlignment.CENTER), 
                 expand=True,
                 height=500,  # スクロールエリアの高さを指定
                 alignment=ft.alignment.center,
@@ -64,7 +64,7 @@ class TimelinePage(ft.Container):
                 post_container = PostContainer(post)
                 # ListViewにコンテナ(インスタンス)を追加
                 self.main_lv.controls.append(post_container)
-            self.page.update()  # type: ignore
+            self.page.update()  
         else:
             print("投稿を取得できませんでした")
             
@@ -105,7 +105,7 @@ class PostContainer(ft.Container):
         time_display = self.format_time_diff(created_at, now)
 
         # ユーザー情報部分
-        user_info = ft.Row([ft.Icon(name=ft.icons.ACCOUNT_CIRCLE,size=26),ft.Text(f"{user_name}", weight="bold"), ft.Text(f"{any_user_id} ", color="#888888"), ft.Text(time_display)])  # type: ignore
+        user_info = ft.Row([ft.Icon(name=ft.icons.ACCOUNT_CIRCLE,size=26),ft.Text(f"{user_name}", weight="bold"), ft.Text(f"{any_user_id} ", color="#888888"), ft.Text(time_display)])  
 
         # 下部のアイコン部分
         action_bar = ft.Container(
@@ -121,7 +121,7 @@ class PostContainer(ft.Container):
         divider = ft.Container(height=10)
         
         self.content = ft.Column([
-            ft.Container(content=user_info),  # type: ignore
+            ft.Container(content=user_info),  
             divider,
             ft.Text(f"{content}", max_lines=5),
             divider,
