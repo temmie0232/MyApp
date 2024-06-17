@@ -69,6 +69,13 @@ class Login(ft.View):
             border_radius=10,
             padding=20,
             border=ft.border.all(1, "#f5f5f5"),
+            shadow=ft.BoxShadow(
+                spread_radius=0,
+                blur_radius=5,
+                color=ft.colors.GREY_500,
+                offset=ft.Offset(0, 2),
+                blur_style=ft.ShadowBlurStyle.OUTER,
+            )
         )
 
     def create_error_dialog(self):
