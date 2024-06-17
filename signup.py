@@ -93,6 +93,13 @@ class SignupStep1(ft.View):
             border_radius=10,
             padding=20,
             border=ft.border.all(1, "#f5f5f5"),
+            shadow=ft.BoxShadow(
+                spread_radius=0,
+                blur_radius=5,
+                color=ft.colors.GREY_500,
+                offset=ft.Offset(0, 0),
+                blur_style=ft.ShadowBlurStyle.OUTER,
+            )
         )
 
     def validate_step1_form(self, e):
@@ -239,6 +246,13 @@ class SignupStep2(ft.View):
             border_radius=10,
             padding=20,
             border=ft.border.all(1, "#f5f5f5"),
+            shadow=ft.BoxShadow(
+                spread_radius=0,
+                blur_radius=5,
+                color=ft.colors.GREY_500,
+                offset=ft.Offset(0, 0),
+                blur_style=ft.ShadowBlurStyle.OUTER,
+            )
         )
 
     def create_date_button(self):

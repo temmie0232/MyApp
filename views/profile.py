@@ -2,6 +2,7 @@ import flet as ft
 import requests
 from dateutil import parser
 from component.postcard import PostCard
+from component.ui_utils import update_banner  # ここでインポート
 
 class ProfilePage(ft.Container):
     def __init__(self, page, any_user_id): 
@@ -15,7 +16,6 @@ class ProfilePage(ft.Container):
         self.bgcolor = "#f2ede7"
         self.border_radius = 20
         self.expand = True        
-        self.page.snack_bar = ft.SnackBar(content=ft.Text("プロフィールを更新しました！"), action="OK")
 
         print(f"ProfilePage が any_user_id <{self.any_user_id}> で初期化されました")
 
@@ -32,7 +32,7 @@ class ProfilePage(ft.Container):
         self.account_info = ft.Text()
         self.edit_button = ft.ElevatedButton()
 
-        self.reload_button = ft.IconButton(icon=ft.icons.REFRESH, on_click=self.reload_posts)
+        self.reload_button = ft.IconButton(icon=ft.icons.REFRESH, icon_color="#42474e",on_click=self.reload_posts)
         
         self.title = ft.Container(
             content=ft.Text("過去の投稿", size=28, weight="w800"),
@@ -97,6 +97,13 @@ class ProfilePage(ft.Container):
             width=400,
             height=350,
             alignment=ft.alignment.center,  
+            shadow=ft.BoxShadow(
+                spread_radius=0,
+                blur_radius=5,
+                color=ft.colors.GREY_500,
+                offset=ft.Offset(0, 0),
+                blur_style=ft.ShadowBlurStyle.OUTER,
+            )
         )
 
     def setup_file_picker(self):
@@ -149,7 +156,7 @@ class ProfilePage(ft.Container):
     def create_profile_image(self):
         """プロフィール画像コンポーネントを作成する"""
         return ft.Container(
-            content=ft.Icon(name=ft.icons.ACCOUNT_CIRCLE, size=100),
+            content=ft.Icon(name=ft.icons.ACCOUNT_CIRCLE, size=100, color="#42474e"),
             alignment=ft.alignment.center
         )
 
@@ -181,11 +188,10 @@ class ProfilePage(ft.Container):
 
     def create_edit_button(self):
         """編集ボタンを作成"""
-        return ft.ElevatedButton(
+        return ft.OutlinedButton(
             text="編集",
             on_click=self.show_edit_dialog,
-            bgcolor="#1976d2",
-            color="#ffffff",
+            style=ft.ButtonStyle(color=ft.colors.BLACK,overlay_color="#e2e2e2")
         )
 
     def show_edit_dialog(self, e):
@@ -281,10 +287,12 @@ class ProfilePage(ft.Container):
             print(f"・{new_user_name}\n・{new_bio}\n・{self.user['icon_path']}\nに更新しました")
             self.user['user_name'] = new_user_name
             self.user['bio'] = new_bio
+
+            # バナー表示をupdate_banner関数に置き換え
+            update_banner(self.page, message="プロフィールが正常に更新されました！", action_text="了解")
+            
             self.display_user_profile()
-            self.page.snack_bar.open = True 
             self.close_dialog(e)
-            self.page.update() 
         else:
             print(f"ファイルの更新中にエラーが発生しました: {response.text}")
     

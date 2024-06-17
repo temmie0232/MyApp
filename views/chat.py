@@ -60,6 +60,13 @@ class ChatContentDisplay(ft.Container):
         self.border_radius = 20
         self.padding = 15
         self.content = self.list_view
+        self.shadow = ft.BoxShadow(
+            spread_radius=0,
+            blur_radius=5,
+            color=ft.colors.GREY_400,
+            offset=ft.Offset(0, 0),
+            blur_style=ft.ShadowBlurStyle.OUTER,
+        )
 
 class Message(ft.Column):
     def __init__(self, name: str, message: str) -> None:
