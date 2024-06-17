@@ -13,21 +13,25 @@ class Login(ft.View):
         self.page.title = "login"
         self.page.theme_mode = ft.ThemeMode.LIGHT
         self.bgcolor = "#aba7a5"
-        
-        self.initialize_ui()
-        self.controls = [self.login_container]
-    
-    def initialize_ui(self):
+
+        # UI要素の初期化
+        self.init_ui()
+
+        # メインコンテナの設定
+        self.controls = [self.create_main_container()]
+
+    def init_ui(self):
+        """UI要素の初期化"""
         self.text_1 = ft.Text("MyAppにログイン", size=20, weight=ft.FontWeight.W_600, font_family="Segoe_UI_BOLD")
         self.input_username = self.create_input_field("メールアドレスの入力", "example@gmail.com")
         self.input_password = self.create_input_field("パスワードの入力", "password", True)
         self.login_btn = ft.ElevatedButton(text="ログイン", color="white", bgcolor="#00608d", on_click=self.handle_login, disabled=True)
         self.register_btn = ft.OutlinedButton(text="新規登録", on_click=self.handle_register)
         self.divider_row = self.create_divider()
-        self.login_container = self.create_container()
         self.dlg_message = self.create_error_dialog()
 
     def create_input_field(self, label, hint_text, password=False):
+        """入力フィールドの作成"""
         return ft.TextField(
             label=label,
             hint_text=hint_text,
@@ -38,12 +42,14 @@ class Login(ft.View):
         )
 
     def create_divider(self):
+        """区切り線の作成"""
         return ft.Row(
             controls=[ft.Container(content=ft.Divider(), width=280, margin=-5)],
             alignment=ft.MainAxisAlignment.CENTER,
         )
-    
-    def create_container(self):
+
+    def create_main_container(self):
+        """メインコンテナの作成"""
         return ft.Container(
             content=ft.Column([
                 self.text_1,
@@ -66,6 +72,7 @@ class Login(ft.View):
         )
 
     def create_error_dialog(self):
+        """エラーダイアログの作成"""
         return ft.AlertDialog(
             modal=True,
             title=ft.Text("エラー"),
@@ -73,49 +80,53 @@ class Login(ft.View):
             actions=[ft.TextButton("閉じる", on_click=self.close_error_dialog)],
             actions_alignment=ft.MainAxisAlignment.END
         )
-    
+
     def validate_login_form(self, e):
-        self.login_btn.disabled = not (self.input_username.value and self.input_password.value)
-        self.page.update() # type: ignore
+        """ログインフォームのバリデーション"""
+        self.login_btn.disabled = not (self.input_username.value and self.input_password.value) 
+        self.page.update()  
 
     def handle_login(self, e):
+        """ログイン処理"""
         email = self.input_username.value
         password = self.input_password.value
         
-        response = requests.post("http://127.0.0.1:5000/login", json={"email": email, "password": password})
+        try:
+            response = requests.post("http://127.0.0.1:5000/login", json={"email": email, "password": password})
 
-        if response.status_code == 200:     
-            # ログイン成功時のユーザー情報   
-            user_data = response.json()
-            # サーバーからのレスポンスを確認
-            print(f"Server response data: {user_data}")
-            # ユーザーIDを取得
-            any_user_id = user_data.get("any_user_id")  # 修正ポイント
+            if response.status_code == 200:
+                user_data = response.json()
+                print(f"Server response data: {user_data}")
 
-            # ユーザーIDをセッションに保存
-            if any_user_id:
-                self.page.session.set("any_user_id", any_user_id)  # 修正ポイント
-                print(f"Logged in any_user_id: {any_user_id}")  # デバッグ用
-                self.page.go("/home")  # type: ignore
+                any_user_id = user_data.get("any_user_id")
+                if any_user_id:
+                    self.page.session.set("any_user_id", any_user_id)  # セッションにユーザーIDを保存 #type: ignore
+                    print(f"Logged in any_user_id: {any_user_id}")
+                    self.page.go("/home")  
+                else:
+                    self.show_error("ユーザーIDが取得できませんでした。")
+
             else:
-                print("ユーザーIDが取得できませんでした。")
-                self.dlg_message.content = ft.Text("ユーザーIDが取得できませんでした。")
-                self.dlg_message.open = True
-                self.page.dialog = self.dlg_message  # type: ignore
-                self.page.update()  # type: ignore
-
-        else:
-            self.dlg_message.content = ft.Text("メールアドレスまたはパスワードが無効です")
-            self.dlg_message.open = True
-            self.page.dialog = self.dlg_message # type: ignore
-            self.page.update() # type: ignore
+                self.show_error("メールアドレスまたはパスワードが無効です")
+        except requests.RequestException as ex:
+            self.show_error(f"サーバーとの通信に失敗しました: {ex}")
 
     def handle_register(self, e):
-        self.page.go("/signup") # type: ignore
-        
+        """新規登録ページに遷移"""
+        self.page.go("/signup")  
+
+    def show_error(self, message):
+        """エラーメッセージの表示"""
+        self.dlg_message.content = ft.Text(message)
+        self.dlg_message.open = True
+        self.page.dialog = self.dlg_message  
+        self.page.update()  
+
     def close_error_dialog(self, e):
+        """エラーダイアログを閉じる"""
         self.dlg_message.open = False
-        self.page.update() # type: ignore
+        self.page.update()  
+
 
 if __name__ == "__main__":
     ft.app(target=Login)

@@ -6,8 +6,7 @@ from views.messages import MessagesPage
 from views.chat import ChatPage
 from views.profile import ProfilePage
 from views.settings import SettingsPage
-from component.post import PostPage
-
+from component.postdialog import PostPage
 
 class MainPage(ft.View):
     def __init__(self, page):
@@ -16,52 +15,38 @@ class MainPage(ft.View):
             vertical_alignment=ft.MainAxisAlignment.START,
             horizontal_alignment=ft.CrossAxisAlignment.START,
         )
-        
+
         self.page = page
         self.bgcolor = "#aaa7a5"
         
+        self.init_ui_elements()  # UI要素の初期化
+        self.controls = [self.create_main_layout()]  # メインレイアウトの設定
+    
+    def init_ui_elements(self):
+        """UI要素の初期化"""
         self.mascot = self.create_mascot()
-        self.post_btn = self.create_post_btn()
+        self.post_btn = self.create_post_button()
         
-        self.post_page = self.create_post_page()  # ダイアログインスタンスを作成
-        
-        self.rail = self.create_nav_rail()
+        self.rail = self.create_navigation_rail()
         self.rail_container = ft.Container(content=self.rail, border_radius=20)
         
         self.views = self.init_views()
-        self.content_view = ft.Container(
-            content=self.views[0],
-            expand=True,
-            border_radius=10,
-        )
+        self.content_view = self.create_view_container(initial_index=0)
         
-        self.controls = [self.create_main_layout()]
+        self.post_page = PostPage(self.page)  # ダイアログインスタンスを作成
     
-    def create_nav_rail(self):
-        destinations = [
-            {"icon": ft.icons.HOME_OUTLINED, "selected_icon": ft.icons.HOME, "label": "ホーム"},
-            {"icon": ft.icons.SEARCH_OUTLINED, "selected_icon": ft.icons.SEARCH, "label": "検索"},
-            {"icon": ft.icons.NOTIFICATIONS_OUTLINED, "selected_icon": ft.icons.NOTIFICATIONS, "label": "通知"},
-            {"icon": ft.icons.MAIL_OUTLINED, "selected_icon": ft.icons.MAIL, "label": "メッセージ"},
-            {"icon": ft.icons.SPEAKER_NOTES_OUTLINED, "selected_icon": ft.icons.SPEAKER_NOTES, "label": "AIチャット"},
-            {"icon": ft.icons.PERSON_OUTLINED, "selected_icon": ft.icons.PERSON, "label": "プロフィール"},
-            {"icon": ft.icons.SETTINGS_OUTLINED, "selected_icon": ft.icons.SETTINGS, "label": "設定"},
-        ]
-        
+    def create_navigation_rail(self):
+        """ナビゲーションレールの作成"""
+        destinations = self.get_navigation_destinations()
+
         rail_destinations = [
             ft.NavigationRailDestination(
-                icon_content=ft.Container(
-                    content=ft.Icon(dest["icon"], size=27),
-                    padding=ft.padding.only(bottom=5, top=5)
-                ),
-                selected_icon_content=ft.Container(
-                    content=ft.Icon(dest["selected_icon"], size=27),
-                    padding=ft.padding.only(bottom=5, top=5)
-                ),
+                icon_content=self.create_icon_container(dest["icon"]),
+                selected_icon_content=self.create_icon_container(dest["selected_icon"]),
                 label=dest["label"],
             ) for dest in destinations
         ]
-        
+
         return ft.NavigationRail(
             selected_index=0,
             label_type=ft.NavigationRailLabelType.ALL,
@@ -73,12 +58,31 @@ class MainPage(ft.View):
             indicator_color="#d2d2d2",
             leading=self.mascot,
             trailing=self.post_btn,
-            on_change=self.handle_nav_change,
+            on_change=self.handle_navigation_change,
         )
-    
+
+    def get_navigation_destinations(self):
+        """ナビゲーションレールの宛先設定"""
+        return [
+            {"icon": ft.icons.HOME_OUTLINED, "selected_icon": ft.icons.HOME, "label": "ホーム"},
+            {"icon": ft.icons.SEARCH_OUTLINED, "selected_icon": ft.icons.SEARCH, "label": "検索"},
+            {"icon": ft.icons.NOTIFICATIONS_OUTLINED, "selected_icon": ft.icons.NOTIFICATIONS, "label": "通知"},
+            {"icon": ft.icons.MAIL_OUTLINED, "selected_icon": ft.icons.MAIL, "label": "メッセージ"},
+            {"icon": ft.icons.SPEAKER_NOTES_OUTLINED, "selected_icon": ft.icons.SPEAKER_NOTES, "label": "AIチャット"},
+            {"icon": ft.icons.PERSON_OUTLINED, "selected_icon": ft.icons.PERSON, "label": "プロフィール"},
+            {"icon": ft.icons.SETTINGS_OUTLINED, "selected_icon": ft.icons.SETTINGS, "label": "設定"},
+        ]
+
+    def create_icon_container(self, icon_name):
+        """アイコンを含むコンテナの作成"""
+        return ft.Container(
+            content=ft.Icon(icon_name, size=27),
+            padding=ft.padding.only(bottom=5, top=5)
+        )
+
     def init_views(self):
-        # セッションからユーザーIDを取得
-        any_user_id = self.page.session.get("any_user_id")  # user_idをany_user_idに変更
+        """各ページのビューを初期化"""
+        any_user_id = self.page.session.get("any_user_id")  
 
         if any_user_id is None:
             self.page.go("/login")
@@ -90,21 +94,23 @@ class MainPage(ft.View):
             2: NotificationsPage(self.page),
             3: MessagesPage(self.page),
             4: ChatPage(self.page),
-            5: ProfilePage(self.page, any_user_id=any_user_id),  # user_idをany_user_idに変更
+            5: ProfilePage(self.page, any_user_id=any_user_id),
             6: SettingsPage(self.page),
         }
-    
-    def create_view_container(self, index):
+
+    def create_view_container(self, initial_index):
+        """ビューを含むコンテナを作成"""
         return ft.Container(
-            content=self.views[index],
+            content=self.views[initial_index],
             expand=True,
             border_radius=20,
         )
-    
+
     def create_main_layout(self):
+        """メインレイアウトの作成"""
         return ft.Row(
             controls=[
-                self.rail_container, 
+                self.rail_container,
                 ft.VerticalDivider(width=1),
                 self.content_view,
             ],
@@ -113,6 +119,7 @@ class MainPage(ft.View):
         )
 
     def create_mascot(self):
+        """マスコットアイコンの作成"""
         return ft.Container(
             content=ft.IconButton(
                 content=ft.Image(
@@ -122,10 +129,11 @@ class MainPage(ft.View):
                     height=50,
                 ),
             ),
-            padding=ft.margin.only(top=15)  # type: ignore
-        )    
-    
-    def create_post_btn(self):
+            padding=ft.margin.only(top=15) 
+        )
+
+    def create_post_button(self):
+        """投稿ボタンの作成"""
         return ft.Container(
             content=ft.Column([
                 ft.Container(height=5),
@@ -137,29 +145,25 @@ class MainPage(ft.View):
                     icon_color="#000000",
                     icon_size=25,
                     tooltip="投稿する"),
-                bgcolor="#f2ede7",
-                border=ft.border.all(2, ft.colors.BLACK),
-                border_radius=ft.border_radius.all(10)),
+                    bgcolor="#f2ede7",
+                    border=ft.border.all(2, ft.colors.BLACK),
+                    border_radius=ft.border_radius.all(10)),
             ])
         )
-        
-    def handle_nav_change(self, e):
+
+    def handle_navigation_change(self, e):
+        """ナビゲーション変更時のハンドリング"""
         selected_index = e.control.selected_index
         self.content_view.content = self.views[selected_index]
         self.update()
 
-    # PostPage のインスタンスを作成
-    def create_post_page(self):
-        # PostPage クラスをインスタンス化する際に、self.page を渡す
-        return PostPage(self.page)
-
-    # ダイアログを表示
     def show_post_page(self, e):
-        self.page.dialog = self.post_page  # ダイアログをページに設定
+        """ダイアログを表示"""
+        self.page.dialog = self.post_page
         self.post_page.open = True
-        self.page.update()  # ページを更新してダイアログを表示
+        self.page.update() 
 
-    # ダイアログを閉じる
-    def close_dlg(self, e):
+    def close_dialog(self, e):
+        """ダイアログを閉じる"""
         self.post_page.open = False
-        self.page.update()  # ページを更新してダイアログを閉じる
+        self.page.update() 

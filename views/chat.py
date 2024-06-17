@@ -6,9 +6,9 @@ from openai import OpenAI
 client = OpenAI()
 
 class ChatPage(ft.Container):
-    def __init__(self,page):
+    def __init__(self, page):
         super().__init__()
-        
+
         self.page = page
         self.padding = 20
         self.bgcolor = "#f2ede7"
@@ -17,108 +17,104 @@ class ChatPage(ft.Container):
 
         # UIの初期化
         self.initialize_ui()
-        
+
         # UIを画面に配置
         self.content = self.create_main_layout()
 
-    # UIの初期化
     def initialize_ui(self):
-        self.title = ft.Text("会話してみる", size = 28, weight = "w800") # type: ignore
-        self.main = self.create_ChatContentDisplay()
-        self.divider = ft.Divider(height = 6, color = "transparent")
-        self.prompt = self.create_PromptField(self.main.content)
+        """UIの初期化"""
+        self.title = ft.Text("会話してみる", size=28, weight="w800")  
+        self.chat_display = ChatContentDisplay()
+        self.prompt = PromptField(self.chat_display.list_view)
 
-    # チャットが表示されるディスプレイの作成
-    def create_ChatContentDisplay(self):
-        return ft.Container(
-            content = ft.ListView(
-                expand = True,
-                spacing = 15,
-                auto_scroll = True,
-            ),
-            width = 520,
-            height = 580,
-            bgcolor = "#e0dfda",
-            border_radius = 20,
-            padding = 15,
-        )
-
-    # プロンプト入力フィールドの作成
-    def create_PromptField(self, chat_list_view):
-        return Prompt(chat_list_view)
-     
-    # メインレイアウトを作成
     def create_main_layout(self) -> ft.Column:
+        """メインレイアウトの作成"""
         return ft.Column(
             [
-                self.title, # 見出し
-                self.divider,
-                self.main,  # チャット表示
-                self.divider,   # スペース
-                self.prompt,    # プロンプト入力欄 # type: ignore
+                self.title,  # 見出し
+                ft.Divider(height=6, color="transparent"),  # スペース
+                self.chat_display,  # チャット表示
+                ft.Divider(height=6, color="transparent"),  # スペース
+                self.prompt,  # プロンプト入力欄
             ],
             expand=True,
             alignment=ft.MainAxisAlignment.CENTER,
-            horizontal_alignment=ft.CrossAxisAlignment.CENTER
+            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
         )
-        
-# メッセージ生成クラス
-class CreateMessage(ft.Column):
+
+class ChatContentDisplay(ft.Container):
+    def __init__(self):
+        super().__init__()
+        self.list_view = ft.ListView(
+            expand=True,
+            spacing=15,
+            auto_scroll=True,
+        )
+        self.setup_ui()
+
+    def setup_ui(self):
+        """チャットが表示されるディスプレイの設定"""
+        self.width = 520
+        self.height = 580
+        self.bgcolor = "#e0dfda"
+        self.border_radius = 20
+        self.padding = 15
+        self.content = self.list_view
+
+class Message(ft.Column):
     def __init__(self, name: str, message: str) -> None:
-        self.name: str = name
-        self.message: str = message
-        self.text = ft.Text(self.message)
-        super().__init__(spacing = 4)
-        self.controls = [ft.Text(self.name,opacity = 0.6), self.text]
+        super().__init__(spacing=4)
+        self.controls = [
+            ft.Text(name, opacity=0.6), 
+            ft.Text(message)
+        ]
 
-# ユーザー入力クラス
-class Prompt(ft.TextField):
-    def __init__(self, chat: ft.ListView) -> None:
+class PromptField(ft.TextField):
+    def __init__(self, chat_list_view: ft.ListView) -> None:
         super().__init__(
-            width = 520,
-            height = 40,
-            border_color = "black",
-            content_padding = 10,
-            cursor_color = "black",
-            on_submit = self.run_prompt,
+            width=520,
+            height=40,
+            border_color="black",
+            content_padding=10,
+            cursor_color="black",
+            on_submit=self.run_prompt,
         )
-        self.chat: ft.ListView = chat
-        
-        # テキストの出力アニメーション
-    def animate_text_output(self, name: str, prompt: str) -> None:
-        word_list: list = []
-        msg = CreateMessage(name,"")
-        self.chat.controls.append(msg)
-        
-        for word in list(prompt):
-            word_list.append(word)
-            msg.text.value = "".join(word_list)
-            self.chat.update()
-            time.sleep(0.016)
-            
-    def user_output(self, prompt: str) -> None:
-        self.animate_text_output(name = "Me", prompt = prompt)
+        self.chat_list_view = chat_list_view
 
-    def gpt_output(self, prompt: str) -> None:
+    def animate_text_output(self, name: str, prompt: str) -> None:
+        """テキストの出力アニメーション"""
+        msg = Message(name, "")
+        self.chat_list_view.controls.append(msg)
+        self.chat_list_view.update()
+
+        for char in prompt:
+            msg.controls[1].value += char   # メッセージのテキストを更新
+            self.chat_list_view.update()
+            time.sleep(0.016)
+
+    def display_user_message(self, prompt: str) -> None:
+        """ユーザーのメッセージを表示"""
+        self.animate_text_output(name="Me", prompt=prompt)
+
+    def display_gpt_response(self, prompt: str) -> None:
+        """GPTの応答を表示"""
         completion = client.chat.completions.create(
-            model = "gpt-3.5-turbo",
-            messages = [
+            model="gpt-3.5-turbo",
+            messages=[
                 {"role": "system", "content": "生意気な子供。何事もめんどくさそうにする。すべてタメ口で返答する。"},
                 {"role": "user", "content": prompt}
             ]
         )
         response_text = completion.choices[0].message.content
-        self.animate_text_output(name = "^^)", prompt = response_text) # type: ignore
-    
-    # すべてのメソッドを実行 
+        self.animate_text_output(name="^^)", prompt=response_text)  
+
     def run_prompt(self, event) -> None:
+        """プロンプトを実行"""
         text = event.control.value
-        self.value = "" # 入力フィールドをクリア
-        
-        self.user_output(prompt = text) # ユーザーの入力内容の表示
-        self.gpt_output(prompt = text) # GPTの応答を表示
+        self.value = ""  # 入力フィールドをクリア
+
+        self.display_user_message(prompt=text)  # ユーザーの入力内容を表示
+        self.display_gpt_response(prompt=text)  # GPTの応答を表示
 
         self.value = ""
         self.update()
-            
-            

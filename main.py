@@ -2,7 +2,7 @@ import flet as ft
 from login import Login
 from signup import SignupStep1, SignupStep2
 from home import MainPage
-from views.profile import ProfilePage  # ProfilePageをインポート
+from views.profile import ProfilePage  
 
 def main(page: ft.Page) -> None:
     print("プログラムが開始しました")
@@ -15,30 +15,30 @@ def main(page: ft.Page) -> None:
         page.views.clear()
         
         if page.route == "/" or page.route == "/login":
-            print(f"{route} に移動しました")
+            print(f" / に移動しました")
             login = Login(page)
             page.views.append(login)
 
         elif page.route == "/signup":
-            print(f"{route} に移動しました")
+            print(f" /signup に移動しました")
             signup1 = SignupStep1(page)
             page.views.append(signup1)
 
         elif page.route == "/signup/2":
-            print(f"{route} に移動しました")
+            print(f" /signup/2 に移動しました")
             signup2 = SignupStep2(page)
             page.views.append(signup2)
 
         elif page.route == "/home":
-            print(f"{route} に移動しました")
+            print(f" /home/ に移動しました")
             mainpage = MainPage(page)
             page.views.append(mainpage)
 
-        elif page.route.startswith("/profile"):
-            any_user_id = page.route.split("/")[-1]
-            print(f"{route} に移動しました - ユーザーID: {any_user_id}")
+        elif page.route.startswith("/profile"): 
+            any_user_id = page.route.split("/")[-1] 
+            print(f" /profike に移動しました - ユーザーID: {any_user_id}")
             profile_page = ProfilePage(page, any_user_id=any_user_id)  # user_idをany_user_idに変更
-            page.views.append(profile_page)
+            page.views.append(profile_page) 
 
         page.update()
     
@@ -46,28 +46,7 @@ def main(page: ft.Page) -> None:
     
     #初期は"/"からスタート
     page.go("/")
-    
-    """
-    def navigate(route, view_class):
-        view_instance = view_class(page)
-        page.views.append(view_instance)
-        print(f"{route} に移動しました")
 
-    def route_handler(route):
-        page.views.clear()
-        routes = {
-            "/login": Login,
-            "/signup": SignupStep1,
-            "/signup/2": SignupStep2,
-            "/home": MainPage,
-        }
-        if page.route in routes:
-            navigate(page.route, routes[page.route]) # type: ignore
-        page.update()
-
-    page.on_route_change = route_handler
-    page.go("/")
-    """
 
 if __name__ == "__main__":
     ft.app(
