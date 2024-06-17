@@ -3,23 +3,24 @@ import requests
 
 class PostPage(ft.AlertDialog):
     def __init__(self, page):
-        
-        self.page = page
-        
-        self.text_field = self.create_text_field()
-        self.text_count = ft.Text("0/200")
-        self.dlg = self.create_dlg()
-        self.post_btn = self.create_post_btn()
-        self.page.snack_bar = ft.SnackBar(content=ft.Text("投稿が完了しました！"), action="OK")
-        
         super().__init__(
-            content=self.dlg,
-            actions=[self.post_btn],
+            content=self.create_dialog_content(),
+            actions=[self.create_post_button()],
             bgcolor="#f2ede7",
             modal=True
         )
         
+        self.page = page
+        
+        # 投稿フィールドと文字数カウンター
+        self.text_field = self.create_text_field()
+        self.text_count = ft.Text("0/200")
+        
+        # SnackBar for post completion
+        self.page.snack_bar = ft.SnackBar(content=ft.Text("投稿が完了しました！"), action="OK")
+        
     def create_text_field(self):
+        """投稿フィールドを作成"""
         return ft.TextField(
             hint_text="何が起きてる？",
             multiline=True,
@@ -31,13 +32,14 @@ class PostPage(ft.AlertDialog):
             on_change=self.check_text_length,
         )
         
-    def create_dlg(self):
+    def create_dialog_content(self):
+        """ダイアログのコンテンツを作成"""
         return ft.Container(
             content=ft.Column([
                 ft.IconButton(
                     icon=ft.icons.CLOSE,
                     icon_color=ft.colors.BLACK,
-                    on_click=self.close_dlg
+                    on_click=self.close_dialog
                 ),
                 self.text_field,
                 self.text_count
@@ -46,7 +48,8 @@ class PostPage(ft.AlertDialog):
             width=500,
         )
 
-    def create_post_btn(self):
+    def create_post_button(self):
+        """投稿ボタンを作成"""
         return ft.IconButton(
             icon=ft.icons.SEND,
             icon_color=ft.colors.BLACK,
@@ -54,57 +57,57 @@ class PostPage(ft.AlertDialog):
             on_click=self.submit_post
         )
         
-    def close_dlg(self, e):
+    def close_dialog(self, e):
+        """ダイアログを閉じる"""
         self.open = False
-        self.page.update() # type: ignore
+        self.page.update()  # type: ignore
 
     def reset_post(self):
+        """投稿フィールドをリセット"""
         self.text_field.value = ""  # テキストフィールドを空白にする
         self.update_text_count(0)
-        self.page.update()  # type: ignore # ページを更新して変更を反映
+        self.page.update()  # type: ignore
 
     def check_text_length(self, e):
-        length = len(self.text_field.value) # type: ignore
+        """投稿内容の文字数をチェック"""
+        length = len(self.text_field.value)  # type: ignore
         self.update_text_count(length)
         
-        if length >= 200: # type: ignore
-            self.post_btn.disabled = True
-        else:
-            self.post_btn.disabled = False
-        
-        self.page.update() # type: ignore
+        self.post_btn.disabled = length > 200  # type: ignore
+        self.page.update()  # type: ignore
             
     def update_text_count(self, length):
+        """文字数カウンターを更新"""
         self.text_count.value = f"{length}/200"
         if length > 200:
             self.text_count.color = ft.colors.RED
             self.text_count.weight = ft.FontWeight.BOLD
-            self.post_btn.tooltip = "文字数がオーバーしています"
+            self.post_btn.tooltip = "文字数がオーバーしています"  # type: ignore
         else:
             self.text_count.color = ft.colors.BLACK
             self.text_count.weight = ft.FontWeight.NORMAL
-            self.post_btn.tooltip = "投稿する"
+            self.post_btn.tooltip = "投稿する"  # type: ignore
         
-        self.page.update() # type: ignore
+        self.page.update()  # type: ignore
     
     def submit_post(self, e):
+        """投稿をサーバーに送信"""
         content = self.text_field.value
-        # ログインセッションからユーザーIDを取得
-        any_user_id = self.page.session.get("any_user_id") # type: ignore
+        any_user_id = self.page.session.get("any_user_id")  # type: ignore
 
         if any_user_id is None:
             print("このセッションでユーザーIDが使用できません")
-            return ... # エラーハンドリング
-
+            return ... # エラーハンドリングを追加する
+        
         print(f"Posting as any_user_id: {any_user_id}") 
         
         response = requests.post("http://127.0.0.1:5000/post", json={"any_user_id": any_user_id, "content": content})
         
         if response.status_code == 201:
             print("投稿が完了しました！")
-            self.page.snack_bar.open = True # type: ignore
+            self.page.snack_bar.open = True  # type: ignore
             self.reset_post()
-            self.close_dlg(e)
-            self.page.update() # type: ignore
+            self.close_dialog(e)
+            self.page.update()  # type: ignore
         else:
             print("投稿に失敗しました。")

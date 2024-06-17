@@ -9,3 +9,5 @@ class SearchPage(ft.Container):
         self.bgcolor = "#f2ede7"
         self.border_radius = 20
         self.expand = True
+    
+    

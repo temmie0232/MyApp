@@ -105,7 +105,7 @@ class PostContainer(ft.Container):
         time_display = self.format_time_diff(created_at, now)
 
         # ユーザー情報部分
-        user_info = ft.Row([ft.Text(f"{user_name}", weight="bold"), ft.Text(f"{any_user_id} ", color="#888888"), ft.Text(time_display)])  # type: ignore
+        user_info = ft.Row([ft.Icon(name=ft.icons.ACCOUNT_CIRCLE,size=26),ft.Text(f"{user_name}", weight="bold"), ft.Text(f"{any_user_id} ", color="#888888"), ft.Text(time_display)])  # type: ignore
 
         # 下部のアイコン部分
         action_bar = ft.Container(

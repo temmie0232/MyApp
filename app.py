@@ -3,7 +3,7 @@ import os
 import mysql.connector
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 app = Flask(__name__)
 
@@ -45,7 +45,7 @@ def register():
     password = data.get("password")
     email_opt_in = data.get("email_opt_in")
     birth_date = data.get("birth_date")
-    created_at = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    created_at = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S') 
 
     hashed_password = hash_password(password)
 
@@ -129,6 +129,38 @@ def get_timeline():
         print("Fetched posts: ", posts)  # デバッグ用に取得した投稿を表示
 
         # 取得したデータをJSONで返す
+        return jsonify(posts), 200
+    except mysql.connector.Error as err:
+        print("問題が発生しました: {}".format(err))
+        return jsonify({"message": "投稿の取得に失敗しました", "error": str(err)}), 500
+    finally:
+        cursor.close()
+        connection.close()
+
+@app.route('/user/<any_user_id>/posts', methods=['GET'])
+def get_user_posts(any_user_id):
+    connection = connect_db()
+    cursor = connection.cursor(dictionary=True)
+
+    try:
+        query = """
+            SELECT 
+                posts.post_id, 
+                posts.content, 
+                posts.created_at, 
+                posts.updated_at, 
+                posts.likes_count, 
+                posts.repost_count, 
+                posts.replies_count, 
+                posts.parent_post_id, 
+                posts.media_url
+            FROM posts
+            WHERE posts.user_id = %s AND posts.is_deleted = 0
+            ORDER BY posts.created_at DESC
+        """
+        cursor.execute(query, (any_user_id,))
+        posts = cursor.fetchall()
+
         return jsonify(posts), 200
     except mysql.connector.Error as err:
         print("問題が発生しました: {}".format(err))

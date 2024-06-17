@@ -46,28 +46,7 @@ def main(page: ft.Page) -> None:
     
     #初期は"/"からスタート
     page.go("/")
-    
-    """
-    def navigate(route, view_class):
-        view_instance = view_class(page)
-        page.views.append(view_instance)
-        print(f"{route} に移動しました")
 
-    def route_handler(route):
-        page.views.clear()
-        routes = {
-            "/login": Login,
-            "/signup": SignupStep1,
-            "/signup/2": SignupStep2,
-            "/home": MainPage,
-        }
-        if page.route in routes:
-            navigate(page.route, routes[page.route]) # type: ignore
-        page.update()
-
-    page.on_route_change = route_handler
-    page.go("/")
-    """
 
 if __name__ == "__main__":
     ft.app(

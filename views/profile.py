@@ -33,19 +33,24 @@ class ProfilePage(ft.Container):
         self.load_user_data()
 
     def load_user_data(self):
+        """ユーザーデータをサーバーから取得して表示"""
         try:
             response = requests.get(f"http://localhost:5000/user/{self.any_user_id}") 
             if response.status_code == 200:
                 self.user = response.json()
                 self.display_user_profile()
             else:
-                self.content.controls.append(ft.Text(f"エラー: ユーザー情報が見つかりません（ステータスコード: {response.status_code}）"))
+                self.show_error_message(f"エラー: ユーザー情報が見つかりません（ステータスコード: {response.status_code}）")
         except Exception as e:
-            self.content.controls.append(ft.Text(f"エラー: ユーザー情報を取得できませんでした: {e}"))
+            self.show_error_message(f"エラー: ユーザー情報を取得できませんでした: {e}")
 
+    def show_error_message(self, message):
+        """エラーメッセージを表示"""
+        self.content.controls.append(ft.Text(message))
         self.page.update()
 
     def display_user_profile(self):
+        """ユーザープロフィールを表示"""
         if not self.user:
             return
         
@@ -59,7 +64,7 @@ class ProfilePage(ft.Container):
         # コンテナに要素を追加
         self.content.controls.clear()
         self.content.controls.extend([
-            #self.profile_image,
+            self.profile_image,
             self.user_info,
             self.bio,
             self.account_info,
@@ -67,6 +72,7 @@ class ProfilePage(ft.Container):
         ])
 
     def create_profile_image(self):
+        """プロフィール画像のコンテナを作成"""
         return ft.Container(
             content=ft.Image(
                 src=self.user.get('icon_path', 'uploads/icons/default/icon.png'),  # デフォルトの画像パスを指定
@@ -81,31 +87,31 @@ class ProfilePage(ft.Container):
         )
 
     def create_user_info(self):
+        """ユーザー情報の表示コンテナを作成"""
         return ft.Column(
             controls=[
-                # ユーザ名
-                ft.Text(f"{self.user['user_name']}", size=28, weight=ft.FontWeight.BOLD),
-                # ユーザID
-                ft.Text(f"@{self.user['any_user_id']}", size=14, color="#888888", weight=ft.FontWeight.NORMAL)  
+                ft.Text(f"{self.user['user_name']}", size=28, weight=ft.FontWeight.BOLD),  # ユーザー名
+                ft.Text(f"@{self.user['any_user_id']}", size=14, color="#888888", weight=ft.FontWeight.NORMAL)  # ユーザーID
             ],
             alignment=ft.MainAxisAlignment.START,
         )
 
     def create_bio(self):
+        """自己紹介のコンテナを作成"""
         return ft.Container(
-            # 自己紹介
-            content=ft.Text(f"{self.user['bio']}", size=16, weight=ft.FontWeight.NORMAL),
+            content=ft.Text(f"{self.user['bio']}", size=16, weight=ft.FontWeight.NORMAL),  # 自己紹介
             padding=ft.padding.all(10),
             border_radius=10,
             bgcolor="#ffffff"
         )
 
     def create_account_info(self):
+        """アカウント作成日情報の表示コンテナを作成"""
         created_at = parser.parse(self.user['created_at'])
-        # アカウント作成日
         return ft.Text(f"アカウント作成日: {created_at.strftime('%Y-%m-%d')}", size=14, color="#888888", weight=ft.FontWeight.NORMAL)
 
     def create_edit_button(self):
+        """編集ボタンを作成"""
         return ft.ElevatedButton(
             text="編集",
             on_click=self.show_edit_dialog,
@@ -114,6 +120,7 @@ class ProfilePage(ft.Container):
         )
 
     def show_edit_dialog(self, e):
+        """編集ダイアログを表示"""
         self.icon_input = ft.FilePicker(on_result=self.icon_selected)
         self.page.overlay.append(self.icon_input)
         
@@ -150,9 +157,8 @@ class ProfilePage(ft.Container):
         self.edit_dialog.open = True
         self.page.update()
         
-    
-    # 未実装
     def icon_selected(self, e: ft.FilePickerResultEvent):
+        """アイコンが選択されたときの処理"""
         if e.files:
             selected_file = e.files[0]
             print(f"選択されたファイル: {selected_file.name}")
@@ -189,10 +195,12 @@ class ProfilePage(ft.Container):
                 
 
     def close_dialog(self, e):
+        """ダイアログを閉じる"""
         self.edit_dialog.open = False
         self.page.update()
 
     def save_profile(self, e):
+        """プロフィールの変更を保存"""
         new_user_name = self.edit_user_name.value
         new_bio = self.edit_bio.value
 
