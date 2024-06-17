@@ -6,7 +6,7 @@ from views.messages import MessagesPage
 from views.chat import ChatPage
 from views.profile import ProfilePage
 from views.settings import SettingsPage
-from component.post import PostPage
+from component.postdialog import PostPage
 
 class MainPage(ft.View):
     def __init__(self, page):
