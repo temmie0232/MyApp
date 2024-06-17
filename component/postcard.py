@@ -5,11 +5,12 @@ class PostCard(ft.Container):
     def __init__(self, post_data):
         super().__init__()
         
+        # コンテナの基本設定
         self.configure_container()
-        
-        # post_dataを元にUIを作成
+
+        # 投稿データを元にUIを作成
         self.create_ui(post_data)
-        
+
     def configure_container(self):
         """コンテナの基本設定を行う"""
         self.padding = ft.padding.only(20, 20, 20, 10)
@@ -20,7 +21,7 @@ class PostCard(ft.Container):
             spread_radius=0,
             blur_radius=5,
             color=ft.colors.GREY_400,
-            offset=ft.Offset(0, 2),
+            offset=ft.Offset(0, 1),
             blur_style=ft.ShadowBlurStyle.OUTER,
         )
         self.width = 500
@@ -31,12 +32,14 @@ class PostCard(ft.Container):
         content_text = self.create_content_text(post_data)
         action_bar = self.create_action_bar()
         
-        # UIコンポーネントを配置
+        # スペース用コンテナ
+        divider = self.create_divider(height=10)
+        
         self.content = ft.Column([
             user_info,
-            self.create_divider(height=10),
+            divider,
             content_text,
-            self.create_divider(height=10),
+            divider,
             ft.Divider(thickness=0.6, height=4),
             action_bar,
         ],
@@ -50,12 +53,13 @@ class PostCard(ft.Container):
         created_at_str = post_data.get("created_at", "")
         
         created_at = self.parse_datetime(created_at_str)
-        time_display = self.format_time_diff(created_at, datetime.datetime.now(datetime.timezone.utc))
+        current_time = datetime.datetime.now(datetime.timezone.utc)
+        time_display = self.format_time_diff(created_at, current_time)
         
         return ft.Row([
             ft.Icon(name=ft.icons.ACCOUNT_CIRCLE, size=26, color="#42474e"),
             ft.Text(f"{user_name}", weight="bold"),
-            ft.Text(f"@{any_user_id}", color="#888888"),
+            ft.Text(f"@{any_user_id} ", color="#888888"),
             ft.Text(time_display)
         ])
 
@@ -68,11 +72,23 @@ class PostCard(ft.Container):
         """アクションバーのコンポーネントを作成"""
         return ft.Container(
             content=ft.Row([
-                ft.IconButton(icon=ft.icons.REPLY_OUTLINED, tooltip="返信", icon_size=18, icon_color=ft.colors.BLACK),
-                ft.IconButton(icon=ft.icons.SYNC, tooltip="リポスト", selected_icon=ft.icons.SYNC, icon_size=18, icon_color=ft.colors.BLACK, selected_icon_color="#00ba7c", selected=False, on_click=self.toggle_icon_button),
-                ft.IconButton(icon=ft.icons.FAVORITE_BORDER, selected_icon=ft.icons.FAVORITE, tooltip="いいね", icon_size=18, icon_color=ft.colors.BLACK, selected_icon_color="#f91880", selected=False, on_click=self.toggle_icon_button),
-            ],
-                height=29),
+                self.create_icon_button(ft.icons.REPLY_OUTLINED, "返信"),
+                self.create_icon_button(ft.icons.SYNC, "リポスト", selected_icon=ft.icons.SYNC, selected_color="#00ba7c"),
+                self.create_icon_button(ft.icons.FAVORITE_BORDER, "いいね", selected_icon=ft.icons.FAVORITE, selected_color="#f91880"),
+            ], height=29),
+        )
+
+    def create_icon_button(self, icon_name, tooltip, selected_icon=None, selected_color=None):
+        """アイコンボタンを作成"""
+        return ft.IconButton(
+            icon=icon_name,
+            selected_icon=selected_icon,
+            tooltip=tooltip,
+            icon_size=18,
+            icon_color=ft.colors.BLACK,
+            selected_icon_color=selected_color,
+            selected=False,
+            on_click=self.toggle_icon_button
         )
 
     def create_divider(self, height=10):

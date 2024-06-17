@@ -2,6 +2,7 @@ import flet as ft
 import requests
 from dateutil import parser
 from component.postcard import PostCard
+from component.ui_utils import update_banner  # ここでインポート
 
 class ProfilePage(ft.Container):
     def __init__(self, page, any_user_id): 
@@ -15,7 +16,6 @@ class ProfilePage(ft.Container):
         self.bgcolor = "#f2ede7"
         self.border_radius = 20
         self.expand = True        
-        self.page.snack_bar = ft.SnackBar(content=ft.Text("プロフィールを更新しました！"), action="OK")
 
         print(f"ProfilePage が any_user_id <{self.any_user_id}> で初期化されました")
 
@@ -287,10 +287,12 @@ class ProfilePage(ft.Container):
             print(f"・{new_user_name}\n・{new_bio}\n・{self.user['icon_path']}\nに更新しました")
             self.user['user_name'] = new_user_name
             self.user['bio'] = new_bio
+
+            # バナー表示をupdate_banner関数に置き換え
+            update_banner(self.page, message="プロフィールが正常に更新されました！", action_text="了解")
+            
             self.display_user_profile()
-            self.page.snack_bar.open = True 
             self.close_dialog(e)
-            self.page.update() 
         else:
             print(f"ファイルの更新中にエラーが発生しました: {response.text}")
     

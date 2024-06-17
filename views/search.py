@@ -2,6 +2,7 @@ import flet as ft
 import requests
 from component.postcard import PostCard
 from component.usercard import UserCard
+from component.ui_utils import update_banner 
 
 class SearchPage(ft.Container):
     def __init__(self, page):
@@ -145,7 +146,6 @@ class SearchPage(ft.Container):
         else:
             print("ユーザーを取得できませんでした")
 
-
     def reload_posts(self, e):
         """投稿をリロードする"""
         self.load_posts()
@@ -154,15 +154,21 @@ class SearchPage(ft.Container):
         """投稿検索クリックハンドリング"""
         self.search_target_post = not self.search_target_post
         if self.search_target_post:
-            self.search_target_user = False  # 投稿が選択されたらユーザーをアンチェック
+            self.search_target_user = False  # 投稿が選択されたらユーザーチェックをはずす
         self.update_popup_menu()
+
+        # バナーを表示
+        update_banner(self.page, message="検索対象が '投稿' に設定されました", action_text="OK")
 
     def check_user_item_clicked(self, e):
         """ユーザー検索クリックハンドリング"""
         self.search_target_user = not self.search_target_user
         if self.search_target_user:
-            self.search_target_post = False  # ユーザーが選択されたら投稿をアンチェック
+            self.search_target_post = False  # ユーザーが選択されたら投稿チェックをはずす
         self.update_popup_menu()
+
+        # バナーを表示
+        update_banner(self.page, message="検索対象が 'ユーザー' に設定されました", action_text="OK")
 
     def update_popup_menu(self):
         """ポップアップメニューの状態を更新"""
@@ -178,7 +184,7 @@ class SearchPage(ft.Container):
         self.display_filtered_data()
 
     def display_filtered_data(self):
-        """検索フィールドの内容に基づいてフィルタリングされたデータを表示 (バックエンド側でフィルタリングしたほうがいい？)"""
+        """検索フィールドの内容に基づいてフィルタリングされたデータを表示"""
         keyword = self.search_field.value.lower()
         self.main_lv.controls.clear()
 

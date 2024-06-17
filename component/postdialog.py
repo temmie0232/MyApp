@@ -1,16 +1,18 @@
 import flet as ft
 import requests
+from component.ui_utils import update_banner
 
 class PostPage(ft.AlertDialog):
     def __init__(self, page):
-        
         self.page = page
         
+        # テキストフィールドとカウント表示の作成
         self.text_field = self.create_text_field()
         self.text_count = ft.Text("0/200")
+        
+        # ダイアログと投稿ボタンの作成
         self.dlg = self.create_dlg()
         self.post_btn = self.create_post_btn()
-        self.page.snack_bar = ft.SnackBar(content=ft.Text("投稿が完了しました！"), action="OK")
         
         super().__init__(
             content=self.dlg,
@@ -20,6 +22,7 @@ class PostPage(ft.AlertDialog):
         )
         
     def create_text_field(self):
+        """テキストフィールドを作成"""
         return ft.TextField(
             hint_text="何が起きてる？",
             multiline=True,
@@ -32,6 +35,7 @@ class PostPage(ft.AlertDialog):
         )
         
     def create_dlg(self):
+        """ダイアログを作成"""
         return ft.Container(
             content=ft.Column([
                 ft.IconButton(
@@ -47,6 +51,7 @@ class PostPage(ft.AlertDialog):
         )
 
     def create_post_btn(self):
+        """投稿ボタンを作成"""
         return ft.IconButton(
             icon=ft.icons.SEND,
             icon_color=ft.colors.BLACK,
@@ -55,26 +60,30 @@ class PostPage(ft.AlertDialog):
         )
         
     def close_dlg(self, e):
+        """ダイアログを閉じる"""
         self.open = False
-        self.page.update() # type: ignore
+        self.page.update()  # ダイアログの状態を更新
 
     def reset_post(self):
+        """投稿後の状態をリセットする"""
         self.text_field.value = ""  # テキストフィールドを空白にする
-        self.update_text_count(0)
-        self.page.update()  # type: ignore # ページを更新して変更を反映
+        self.update_text_count(0)  # テキストカウントをリセット
+        self.page.update()  # ページを更新して変更を反映
 
     def check_text_length(self, e):
-        length = len(self.text_field.value) # type: ignore
+        """テキストの長さをチェックして表示"""
+        length = len(self.text_field.value)  # テキストの長さを取得
         self.update_text_count(length)
         
-        if length >= 200: # type: ignore
+        if length >= 200:  # 文字数が200を超えた場合の処理
             self.post_btn.disabled = True
         else:
             self.post_btn.disabled = False
         
-        self.page.update() # type: ignore
+        self.page.update()  # ページの状態を更新
             
     def update_text_count(self, length):
+        """テキストのカウントを更新"""
         self.text_count.value = f"{length}/200"
         if length > 200:
             self.text_count.color = ft.colors.RED
@@ -85,16 +94,17 @@ class PostPage(ft.AlertDialog):
             self.text_count.weight = ft.FontWeight.NORMAL
             self.post_btn.tooltip = "投稿する"
         
-        self.page.update() # type: ignore
+        self.page.update()  # ページの状態を更新
     
     def submit_post(self, e):
+        """投稿をサーバーに送信"""
         content = self.text_field.value
         # ログインセッションからユーザーIDを取得
-        any_user_id = self.page.session.get("any_user_id") # type: ignore
+        any_user_id = self.page.session.get("any_user_id")  # セッションからユーザーIDを取得
 
         if any_user_id is None:
             print("このセッションでユーザーIDが使用できません")
-            return ... # エラーハンドリング
+            return  # エラーハンドリング
 
         print(f"any_user_id: <{any_user_id}> として投稿") 
         
@@ -102,9 +112,11 @@ class PostPage(ft.AlertDialog):
         
         if response.status_code == 201:
             print("投稿が完了しました！")
-            self.page.snack_bar.open = True # type: ignore
+            # update_banner関数を使用してバナーを表示
+            update_banner(self.page, message="投稿が完了しました！", action_text="OK")
             self.reset_post()
             self.close_dlg(e)
-            self.page.update() # type: ignore
         else:
             print("投稿に失敗しました。")
+            # エラー時のバナーを表示
+            update_banner(self.page, message="投稿に失敗しました。", action_text="ok")
