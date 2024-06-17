@@ -8,6 +8,13 @@ class PostCard(ft.Container):
         self.padding = 10
         self.bgcolor = "#ffffff"
         self.border_radius = 10
+        self.shadow=ft.BoxShadow(
+            spread_radius=0,
+            blur_radius=5,
+            color=ft.colors.GREY_400,
+            offset=ft.Offset(0, 2),
+            blur_style=ft.ShadowBlurStyle.OUTER,
+        )
 
         # 外側左右25,上下5
         self.margin = ft.margin.only(25, 5, 25, 5)
@@ -36,7 +43,7 @@ class PostCard(ft.Container):
         time_display = self.format_time_diff(created_at, now)
 
         # ユーザー情報部分
-        user_info = ft.Row([ft.Icon(name=ft.icons.ACCOUNT_CIRCLE,size=26),ft.Text(f"{user_name}", weight="bold"), ft.Text(f"@{any_user_id} ", color="#888888"), ft.Text(time_display)])  
+        user_info = ft.Row([ft.Icon(name=ft.icons.ACCOUNT_CIRCLE,size=26, color="#42474e",),ft.Text(f"{user_name}", weight="bold"), ft.Text(f"@{any_user_id} ", color="#888888"), ft.Text(time_display)])  
 
         # 下部のアイコン部分
         action_bar = ft.Container(
