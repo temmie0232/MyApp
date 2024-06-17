@@ -97,7 +97,7 @@ class SignupStep1(ft.View):
                 spread_radius=0,
                 blur_radius=5,
                 color=ft.colors.GREY_500,
-                offset=ft.Offset(0, 2),
+                offset=ft.Offset(0, 0),
                 blur_style=ft.ShadowBlurStyle.OUTER,
             )
         )
@@ -250,7 +250,7 @@ class SignupStep2(ft.View):
                 spread_radius=0,
                 blur_radius=5,
                 color=ft.colors.GREY_500,
-                offset=ft.Offset(0, 2),
+                offset=ft.Offset(0, 0),
                 blur_style=ft.ShadowBlurStyle.OUTER,
             )
         )
