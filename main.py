@@ -2,7 +2,7 @@ import flet as ft
 from login import Login
 from signup import SignupStep1, SignupStep2
 from home import MainPage
-from views.profile import ProfilePage  # ProfilePageをインポート
+from views.profile import ProfilePage  
 
 def main(page: ft.Page) -> None:
     print("プログラムが開始しました")

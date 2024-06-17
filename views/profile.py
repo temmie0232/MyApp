@@ -37,7 +37,7 @@ class ProfilePage(ft.Container):
         self.title = ft.Container(
             content=ft.Text("過去の投稿", size=28, weight="w800"),
             alignment=ft.alignment.center
-        )  # タイトルを Container でラップして alignment を指定
+        ) 
 
         self.top_bar = ft.Row([self.title,self.reload_button],alignment=ft.MainAxisAlignment.CENTER)
 
@@ -45,10 +45,10 @@ class ProfilePage(ft.Container):
         
         self.timeline = ft.Column(
             [
-                self.top_bar,  # タイトルを追加
+                self.top_bar,
                 ft.Container(content=ft.Divider(), alignment=ft.alignment.center),  # Dividerを追加
                 ft.Container(
-                    content=self.main_lv,  # タイムラインの投稿エリア
+                    content=self.main_lv,
                     expand=True,
                     height=500,  # スクロールエリアの高さを指定
                     alignment=ft.alignment.center,
@@ -171,7 +171,7 @@ class ProfilePage(ft.Container):
             padding=ft.padding.all(10),
             border_radius=10,
             bgcolor="#F3F2F4",
-            alignment=ft.alignment.center,  # 自己紹介を中央揃え
+            alignment=ft.alignment.center,  
         )
 
     def create_account_info(self):

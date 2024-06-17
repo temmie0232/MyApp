@@ -18,7 +18,7 @@ for folder in [UPLOAD_FOLDER_ICONS, UPLOAD_FOLDER_POSTS]:
 
 app.secret_key = os.environ.get("SECRET_KEY", "default_secret_key") 
 app.config["SESSION_PERMANENT"] = True
-app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(minutes=60)  # 例: セッションの有効期限を60分に設定
+app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(minutes=60)  
 
 def connect_db():
     return mysql.connector.connect(
@@ -39,7 +39,7 @@ def home():
 def register():
     data = request.get_json()
 
-    any_user_id = data.get("any_user_id")  # 修正ポイント: user_idをany_user_idに変更
+    any_user_id = data.get("any_user_id")
     user_name = data.get("user_name")
     email = data.get("email")
     password = data.get("password")
@@ -126,7 +126,6 @@ def get_timeline():
 
         # 結果を取得
         posts = cursor.fetchall()
-        print("Fetched posts: ", posts)  # デバッグ用に取得した投稿を表示
 
         # 取得したデータをJSONで返す
         return jsonify(posts), 200
@@ -143,7 +142,7 @@ def get_user_posts(any_user_id):
     cursor = connection.cursor(dictionary=True)
 
     try:
-        # まず、any_user_id に対応する user_id を取得する
+        # any_user_id に対応する user_id を取得する
         user_query = "SELECT user_id FROM users WHERE any_user_id = %s"
         cursor.execute(user_query, (any_user_id,))
         user = cursor.fetchone()
@@ -153,7 +152,7 @@ def get_user_posts(any_user_id):
 
         user_id = user['user_id']
 
-        # 次に、その user_id を使用してユーザーの投稿を取得する
+        # その user_id を使用してユーザーの投稿を取得する
         posts_query = """
             SELECT 
                 posts.post_id, 
