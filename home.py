@@ -128,6 +128,8 @@ class MainPage(ft.View):
                     width=50,
                     height=50,
                 ),
+                url="https://github.com/temmie0232/MyApp",
+                tooltip="リポジトリを開く"
             ),
             padding=ft.margin.only(top=15) 
         )
