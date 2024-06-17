@@ -53,8 +53,20 @@ class PostCard(ft.Container):
         created_at_str = post_data.get("created_at", "")
         
         created_at = self.parse_datetime(created_at_str)
+        print(f"作成日時 : {created_at}")
+        
+        # 現在のUTC時間を取得
         current_time = datetime.datetime.now(datetime.timezone.utc)
-        time_display = self.format_time_diff(created_at, current_time)
+        print(f"UTC現在時間 : {current_time}")
+
+        # JSTに変換
+        jst_offset = datetime.timedelta(hours=9)
+        jst_current_time = current_time + jst_offset
+        print(f"JST現在時間 : {jst_current_time}")
+        
+        # 表示する時間差をフォーマット
+        time_display = self.format_time_diff(created_at, jst_current_time)
+        print(f"表示時間 : {time_display}")
         
         return ft.Row([
             ft.Icon(name=ft.icons.ACCOUNT_CIRCLE, size=26, color="#42474e"),
