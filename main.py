@@ -9,6 +9,7 @@ def main(page: ft.Page) -> None:
     
     page.title = "MyApp"
     page.theme_mode = ft.ThemeMode.LIGHT
+
     
     # ページ移動用ルーター
     def router(route):
@@ -37,7 +38,7 @@ def main(page: ft.Page) -> None:
         elif page.route.startswith("/profile"): 
             any_user_id = page.route.split("/")[-1] 
             print(f" /profile に移動しました - ユーザーID: {any_user_id}")
-            profile_page = ProfilePage(page, any_user_id=any_user_id)  # user_idをany_user_idに変更
+            profile_page = ProfilePage(page, any_user_id=any_user_id)  
             page.views.append(profile_page) 
 
         page.update()
