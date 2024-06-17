@@ -101,7 +101,7 @@ class ProfilePage(ft.Container):
                 spread_radius=0,
                 blur_radius=5,
                 color=ft.colors.GREY_500,
-                offset=ft.Offset(0, 2),
+                offset=ft.Offset(0, 0),
                 blur_style=ft.ShadowBlurStyle.OUTER,
             )
         )
