@@ -145,6 +145,7 @@ class SearchPage(ft.Container):
         else:
             print("ユーザーを取得できませんでした")
 
+
     def reload_posts(self, e):
         """投稿をリロードする"""
         self.load_posts()
