@@ -1,17 +1,11 @@
-# Todo_App_login
+# MyApp
 
-ログイン機能により、プライベートなTodo管理をブラウザから行えます
 
-## Objective
+## 目標
 
-- echo や gin などのフレームワークなどは使用せずに、標準パッケージやサードパッケージのみでユーザーの登録、ログイン、ログアウト機能や、データのCRUD処理（net/http）を実装しました。
-- heroku にデプロイ。
-- Goのシステム開発の上での基盤の理解（応用可能）
 
-## Specification
+## 仕様
 
-- Golang, HTML, CSS, Bootstrap, jQuery
 
-echo や gin などのフレームワークなどは使用せずに、標準パッケージやサードパッケージのみでユーザーの登録、ログイン、ログアウト機能や、データのCRUD処理（net/http）を実装しました。また heroku にデプロイをしました。
 
 ## Usage
