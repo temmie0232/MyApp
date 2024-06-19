@@ -62,7 +62,7 @@ class SearchPage(ft.Container):
             border_width=1,
             focused_border_width=2,
             border_radius=5,
-            color=ft.colors.WHITE,
+            color=ft.colors.BLACK,
             width=400,
             on_change=self.on_search_change  # 変更イベントを監視
         )
