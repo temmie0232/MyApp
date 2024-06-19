@@ -1,0 +1,4 @@
+ * Serving Flask app 'api'
+ * Debug mode: on
+Database returned: (1, 'root', 'aaa', 'root', 'pbkdf2:sha256:600000$3O6zLDLNFT47T3p2$bac8c4be04d7a6386c7ebf272b94de8bf9a9a820ff9faa16b628167bad6b03f2', 1, datetime.date(1999, 12, 31), 'uploads/icons/root_icon.jpg', 'ここは自己紹介です！!', datetime.datetime(2024, 6, 13, 11, 18, 31))
+Database returned: (1, 'root', 'てんね', 'root', 'pbkdf2:sha256:600000$3O6zLDLNFT47T3p2$bac8c4be04d7a6386c7ebf272b94de8bf9a9a820ff9faa16b628167bad6b03f2', 1, datetime.date(1999, 12, 31), 'uploads/icons/root_icon.jpg', 'ここは自己紹介です', datetime.datetime(2024, 6, 13, 11, 18, 31))
