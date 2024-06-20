@@ -1,3 +1,6 @@
+
+![IMG_1339](https://github.com/temmie0232/MyApp/assets/48820535/edc5ecfe-47c5-4262-821d-b14b57bf32fb)
+
 # MyApp
 
 ユーザーが短い文章を投稿をして、他のユーザーとリアルタイムでコミュニケーションを取ることができるアプリ。
