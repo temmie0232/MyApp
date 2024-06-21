@@ -1,15 +1,13 @@
 import flet as ft
 
 class UserCard(ft.Container):
-    def __init__(self, post_data, on_click):
+    def __init__(self, post_data):
         super().__init__()
         
-        self.post_data = post_data
-        self.on_click_handler = on_click 
         self.configure_container()
-        self.create_ui(post_data)
         
-        self.on_click = self.handle_click
+        # post_dataを元にUIを作成
+        self.create_ui(post_data)
         
     def configure_container(self):
         """コンテナの基本設定を行う"""
@@ -48,8 +46,3 @@ class UserCard(ft.Container):
             ft.Text(f"@{any_user_id}", color="#888888"),
         ])
 
-    def handle_click(self, e):
-        """クリックされたときの処理"""
-        any_user_id = self.post_data.get("any_user_id", "unknown_user")
-        if self.on_click_handler:
-            self.on_click_handler(any_user_id)

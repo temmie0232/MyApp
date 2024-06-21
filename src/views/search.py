@@ -226,12 +226,7 @@ class SearchPage(ft.Container):
         elif self.search_target_user:
             filtered_users = [user for user in self.all_users if keyword in user['any_user_id'].lower()]
             for user in filtered_users:
-                user_container = UserCard(user, on_click=self.show_user_profile)
+                user_container = UserCard(user)
                 self.main_lv.controls.append(user_container)
 
         self.page.update()
-
-    def show_user_profile(self, any_user_id):
-        """ユーザープロファイルを表示"""
-        main_page = self.page.views[0]  # MainPageのインスタンスを取得
-        main_page.display_user_profile(any_user_id)
