@@ -20,9 +20,13 @@ app.secret_key = os.environ.get("SECRET_KEY", "default_secret_key")
 app.config["SESSION_PERMANENT"] = True
 app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(minutes=60)  
 
+# 環境変数からDBホストを取得
+db_host = os.environ.get("DB_HOST", "localhost")
+
 def connect_db():
     return mysql.connector.connect(
-        host="localhost",
+        #host="localhost",
+        host=db_host,
         user="root",
         password="D3tvn426",
         database="myapp_db"
