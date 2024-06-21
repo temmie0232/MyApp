@@ -2,20 +2,21 @@ import flet as ft
 import requests
 from dateutil import parser
 from component.postcard import PostCard
-from component.ui_utils import update_banner  # ここでインポート
+from component.ui_utils import update_banner
 
 class ProfilePage(ft.Container):
-    def __init__(self, page, any_user_id): 
+    def __init__(self, page, any_user_id, logged_in_user_id):
         super().__init__()
 
         self.page = page
-        self.any_user_id = any_user_id 
+        self.any_user_id = any_user_id
+        self.logged_in_user_id = logged_in_user_id
         self.user = None
         self.selected_icon_file = None
         self.padding = 20
         self.bgcolor = "#f2ede7"
         self.border_radius = 20
-        self.expand = True        
+        self.expand = True
 
         print(f"ProfilePage が any_user_id <{self.any_user_id}> で初期化されました")
 
@@ -32,25 +33,25 @@ class ProfilePage(ft.Container):
         self.account_info = ft.Text()
         self.edit_button = ft.ElevatedButton()
 
-        self.reload_button = ft.IconButton(icon=ft.icons.REFRESH, icon_color="#42474e",on_click=self.reload_posts)
-        
+        self.reload_button = ft.IconButton(icon=ft.icons.REFRESH, icon_color="#42474e", on_click=self.reload_posts)
+
         self.title = ft.Container(
             content=ft.Text("過去の投稿", size=28, weight="w800"),
             alignment=ft.alignment.center
-        ) 
+        )
 
-        self.top_bar = ft.Row([self.title,self.reload_button],alignment=ft.MainAxisAlignment.CENTER)
+        self.top_bar = ft.Row([self.title, self.reload_button], alignment=ft.MainAxisAlignment.CENTER)
 
         self.main_lv = ft.Column(spacing=10, scroll=ft.ScrollMode.AUTO)
-        
+
         self.timeline = ft.Column(
             [
                 self.top_bar,
-                ft.Container(content=ft.Divider(), alignment=ft.alignment.center),  # Dividerを追加
+                ft.Container(content=ft.Divider(), alignment=ft.alignment.center),
                 ft.Container(
                     content=self.main_lv,
                     expand=True,
-                    height=500,  # スクロールエリアの高さを指定
+                    height=500,
                     alignment=ft.alignment.center,
                 ),
             ],
@@ -65,19 +66,24 @@ class ProfilePage(ft.Container):
             [
                 ft.Container(self.profile_component, alignment=ft.alignment.center, expand=True),
                 ft.VerticalDivider(),
-                ft.Container(self.timeline, alignment=ft.alignment.center, expand=True),  # タイムラインを右側に配置
+                ft.Container(self.timeline, alignment=ft.alignment.center, expand=True),
             ],
             alignment=ft.MainAxisAlignment.CENTER,
             expand=True
         )
-        
+
     def create_profile_component(self):
         """プロフィールコンポーネントを作成する"""
         profile_image = self.create_profile_image()
         user_info = self.create_user_info()
         bio = self.create_bio()
         account_info = self.create_account_info()
-        edit_button = self.create_edit_button()
+
+        # 編集ボタンまたはメッセージ送信ボタンの表示
+        if self.any_user_id == self.logged_in_user_id:
+            action_button = self.create_edit_button()
+        else:
+            action_button = self.create_message_button()
 
         return ft.Container(
             content=ft.Column(
@@ -86,17 +92,18 @@ class ProfilePage(ft.Container):
                     user_info,
                     bio,
                     account_info,
-                    edit_button
+                    ft.Divider(),
+                    action_button
                 ],
-                alignment=ft.MainAxisAlignment.CENTER, 
+                alignment=ft.MainAxisAlignment.CENTER,
                 horizontal_alignment=ft.CrossAxisAlignment.CENTER,
             ),
             padding=20,
             border_radius=20,
             bgcolor="#ffffff",
             width=400,
-            height=350,
-            alignment=ft.alignment.center,  
+            height=375,
+            alignment=ft.alignment.center,
             shadow=ft.BoxShadow(
                 spread_radius=0,
                 blur_radius=5,
@@ -123,7 +130,7 @@ class ProfilePage(ft.Container):
                 self.show_error_message(f"エラー: ユーザー情報が見つかりません（ステータスコード: {response.status_code}）")
         except Exception as e:
             self.show_error_message(f"エラー: ユーザー情報を取得できませんでした: {e}")
-                
+
     def load_posts(self):
         """ユーザーの投稿をロード"""
         try:
@@ -148,7 +155,6 @@ class ProfilePage(ft.Container):
         self.content = self.create_main_layout()
         self.page.update()
 
-
     def show_error_message(self, message):
         """エラーメッセージを表示"""
         print(message)
@@ -167,7 +173,7 @@ class ProfilePage(ft.Container):
                 ft.Text(f"{self.user['user_name']}", size=32, weight=ft.FontWeight.BOLD),
                 ft.Text(f"@{self.user['any_user_id']}", size=14, color="#888888", weight=ft.FontWeight.NORMAL)
             ],
-            alignment=ft.MainAxisAlignment.CENTER,  # ユーザー情報を中央揃え
+            alignment=ft.MainAxisAlignment.CENTER,
             horizontal_alignment=ft.CrossAxisAlignment.CENTER,
         )
 
@@ -178,7 +184,7 @@ class ProfilePage(ft.Container):
             padding=ft.padding.all(10),
             border_radius=10,
             bgcolor="#F3F2F4",
-            alignment=ft.alignment.center,  
+            alignment=ft.alignment.center,
         )
 
     def create_account_info(self):
@@ -191,19 +197,27 @@ class ProfilePage(ft.Container):
         return ft.OutlinedButton(
             text="編集",
             on_click=self.show_edit_dialog,
-            style=ft.ButtonStyle(color=ft.colors.BLACK,overlay_color="#e2e2e2")
+            style=ft.ButtonStyle(color=ft.colors.BLACK, overlay_color="#e2e2e2")
+        )
+
+    def create_message_button(self):
+        """メッセージ送信ボタンを作成"""
+        return ft.OutlinedButton(
+            text="メッセージを送信",
+            on_click=self.send_message,
+            style=ft.ButtonStyle(color=ft.colors.BLACK, overlay_color="#e2e2e2")
         )
 
     def show_edit_dialog(self, e):
         """編集ダイアログを表示"""
         self.icon_input = ft.FilePicker(on_result=self.icon_selected)
         self.page.overlay.append(self.icon_input)
-        
+
         self.edit_user_name = ft.TextField(label="ユーザー名", bgcolor=ft.colors.WHITE, value=self.user['user_name'])
         self.edit_bio = ft.TextField(label="自己紹介", multiline=True, bgcolor=ft.colors.WHITE, value=self.user['bio'])
 
         self.upload_status_container = ft.Row(controls=[])
-        
+
         self.edit_dialog = ft.AlertDialog(
             modal=True,
             title=ft.Column([ft.Text("プロフィールを編集")], horizontal_alignment=ft.CrossAxisAlignment.CENTER,),
@@ -231,7 +245,7 @@ class ProfilePage(ft.Container):
         self.page.dialog = self.edit_dialog
         self.edit_dialog.open = True
         self.page.update()
-        
+
     def icon_selected(self, e: ft.FilePickerResultEvent):
         """アイコンが選択されたときの処理"""
         if e.files:
@@ -261,7 +275,7 @@ class ProfilePage(ft.Container):
                     )
                 )
                 self.page.update()
-                
+
             else:
                 print(f"ファイルのアップロード中にエラーが発生しました: {response.text}")
 
@@ -278,7 +292,7 @@ class ProfilePage(ft.Container):
         data = {
             "user_name": new_user_name,
             "bio": new_bio,
-            "icon_path": self.user.get('icon_path')  
+            "icon_path": self.user.get('icon_path')
         }
 
         response = requests.post(f"http://localhost:5000/update_user/{self.any_user_id}", json=data)
@@ -288,15 +302,18 @@ class ProfilePage(ft.Container):
             self.user['user_name'] = new_user_name
             self.user['bio'] = new_bio
 
-            # バナー表示をupdate_banner関数に置き換え
             update_banner(self.page, message="プロフィールが正常に更新されました！", action_text="了解")
-            
+
             self.display_user_profile()
             self.close_dialog(e)
         else:
             print(f"ファイルの更新中にエラーが発生しました: {response.text}")
-    
+
     def reload_posts(self, e):
         """投稿をリロードするメソッド"""
         self.main_lv.controls.clear()  # 現在の投稿をクリア
         self.load_posts()  # 再度投稿を読み込む
+
+    def send_message(self, e):
+        """メッセージ送信処理（仮）"""
+        print("メッセージを送信する処理")
