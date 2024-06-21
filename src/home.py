@@ -98,6 +98,13 @@ class MainPage(ft.View):
             6: SettingsPage(self.page),
         }
 
+        
+    def display_user_profile(self, any_user_id):
+        """ユーザープロファイルを表示"""
+        profile_page = ProfilePage(self.page, any_user_id=any_user_id)
+        self.content_view.content = profile_page
+        self.update()
+
     def create_view_container(self, initial_index):
         """ビューを含むコンテナを作成"""
         return ft.Container(
