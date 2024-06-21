@@ -9,7 +9,7 @@ from views.settings import SettingsPage
 from component.postdialog import PostPage
 
 class MainPage(ft.View):
-    def __init__(self, page):
+    def __init__(self, page, logged_in_user_id):
         super().__init__(
             route="/home",
             vertical_alignment=ft.MainAxisAlignment.START,
@@ -17,6 +17,7 @@ class MainPage(ft.View):
         )
 
         self.page = page
+        self.logged_in_user_id = logged_in_user_id
         self.bgcolor = "#aaa7a5"
         
         self.init_ui_elements()  # UI要素の初期化
@@ -94,14 +95,14 @@ class MainPage(ft.View):
             2: NotificationsPage(self.page),
             3: MessagesPage(self.page),
             4: ChatPage(self.page),
-            5: ProfilePage(self.page, any_user_id=any_user_id),
+            5: ProfilePage(self.page, any_user_id=any_user_id, logged_in_user_id=self.logged_in_user_id),
             6: SettingsPage(self.page),
         }
 
         
     def display_user_profile(self, any_user_id):
         """ユーザープロファイルを表示"""
-        profile_page = ProfilePage(self.page, any_user_id=any_user_id)
+        profile_page = ProfilePage(self.page, any_user_id=any_user_id, logged_in_user_id=self.logged_in_user_id)
         self.content_view.content = profile_page
         self.update()
 
