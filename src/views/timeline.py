@@ -40,7 +40,7 @@ class TimelinePage(ft.Container):
     # UIの配置
     def create_main_layout(self):
         return ft.Column([
-            ft.Container(self.top_bar,alignment=ft.alignment.center),
+            ft.Container(self.top_bar, alignment=ft.alignment.center, height = 58),
             ft.Container(ft.Divider(), alignment=ft.alignment.center),
             ft.Container(content=ft.Row([
                 ft.VerticalDivider(),
