@@ -170,6 +170,9 @@ class SearchPage(ft.Container):
         # ラベルを更新
         self.update_search_label()
 
+        # 検索対象が変更されたらすぐにフィルタリング
+        self.display_filtered_data()
+
     def check_user_item_clicked(self, e):
         """ユーザー検索クリックハンドリング"""
         self.search_target_user = not self.search_target_user
@@ -182,6 +185,9 @@ class SearchPage(ft.Container):
 
         # ラベルを更新
         self.update_search_label()
+
+        # 検索対象が変更されたらすぐにフィルタリング
+        self.display_filtered_data()
 
     def update_popup_menu(self):
         """ポップアップメニューの状態を更新"""
