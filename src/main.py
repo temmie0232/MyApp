@@ -10,10 +10,13 @@ def main(page: ft.Page) -> None:
     page.title = "MyApp"
     page.theme_mode = ft.ThemeMode.LIGHT
 
-    
     # ページ移動用ルーター
     def router(route):
         page.views.clear()
+
+        # セッションから logged_in_user_id を取得
+        logged_in_user_id = page.session.get("any_user_id")
+
         
         if page.route == "/" or page.route == "/login":
             print(f" / に移動しました")
@@ -32,7 +35,7 @@ def main(page: ft.Page) -> None:
 
         elif page.route == "/home":
             print(f" /home に移動しました")
-            mainpage = MainPage(page)
+            mainpage = MainPage(page, logged_in_user_id)
             page.views.append(mainpage)
 
         elif page.route.startswith("/profile"): 

@@ -3,8 +3,9 @@ import requests
 from component.ui_utils import update_banner
 
 class PostPage(ft.AlertDialog):
-    def __init__(self, page):
+    def __init__(self, page, on_post_success=None):
         self.page = page
+        self.on_post_success = on_post_success
         
         # テキストフィールドとカウント表示の作成
         self.text_field = self.create_text_field()
@@ -99,12 +100,11 @@ class PostPage(ft.AlertDialog):
     def submit_post(self, e):
         """投稿をサーバーに送信"""
         content = self.text_field.value
-        # ログインセッションからユーザーIDを取得
-        any_user_id = self.page.session.get("any_user_id")  # セッションからユーザーIDを取得
+        any_user_id = self.page.session.get("any_user_id")
 
         if any_user_id is None:
             print("このセッションでユーザーIDが使用できません")
-            return  # エラーハンドリング
+            return
 
         print(f"any_user_id: <{any_user_id}> として投稿") 
         
@@ -112,11 +112,13 @@ class PostPage(ft.AlertDialog):
         
         if response.status_code == 201:
             print("投稿が完了しました！")
-            # update_banner関数を使用してバナーを表示
             update_banner(self.page, message="投稿が完了しました！", action_text="OK")
             self.reset_post()
             self.close_dlg(e)
+            
+            # 投稿成功時にコールバック関数を呼び出す
+            if self.on_post_success:
+                self.on_post_success()
         else:
             print("投稿に失敗しました。")
-            # エラー時のバナーを表示
             update_banner(self.page, message="投稿に失敗しました。", action_text="ok")

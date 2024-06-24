@@ -9,7 +9,7 @@ from views.settings import SettingsPage
 from component.postdialog import PostPage
 
 class MainPage(ft.View):
-    def __init__(self, page):
+    def __init__(self, page, logged_in_user_id):
         super().__init__(
             route="/home",
             vertical_alignment=ft.MainAxisAlignment.START,
@@ -17,6 +17,7 @@ class MainPage(ft.View):
         )
 
         self.page = page
+        self.logged_in_user_id = logged_in_user_id
         self.bgcolor = "#aaa7a5"
         
         self.init_ui_elements()  # UI要素の初期化
@@ -33,7 +34,7 @@ class MainPage(ft.View):
         self.views = self.init_views()
         self.content_view = self.create_view_container(initial_index=0)
         
-        self.post_page = PostPage(self.page)  # ダイアログインスタンスを作成
+        self.post_page = PostPage(self.page, on_post_success=self.update_timeline)  # ダイアログインスタンスを作成
     
     def create_navigation_rail(self):
         """ナビゲーションレールの作成"""
@@ -67,7 +68,7 @@ class MainPage(ft.View):
             {"icon": ft.icons.HOME_OUTLINED, "selected_icon": ft.icons.HOME, "label": "ホーム"},
             {"icon": ft.icons.SEARCH_OUTLINED, "selected_icon": ft.icons.SEARCH, "label": "検索"},
             {"icon": ft.icons.NOTIFICATIONS_OUTLINED, "selected_icon": ft.icons.NOTIFICATIONS, "label": "通知"},
-            {"icon": ft.icons.MAIL_OUTLINED, "selected_icon": ft.icons.MAIL, "label": "メッセージ"},
+            #{"icon": ft.icons.MAIL_OUTLINED, "selected_icon": ft.icons.MAIL, "label": "メッセージ"},
             {"icon": ft.icons.SPEAKER_NOTES_OUTLINED, "selected_icon": ft.icons.SPEAKER_NOTES, "label": "AIチャット"},
             {"icon": ft.icons.PERSON_OUTLINED, "selected_icon": ft.icons.PERSON, "label": "プロフィール"},
             {"icon": ft.icons.SETTINGS_OUTLINED, "selected_icon": ft.icons.SETTINGS, "label": "設定"},
@@ -92,11 +93,18 @@ class MainPage(ft.View):
             0: TimelinePage(self.page),
             1: SearchPage(self.page),
             2: NotificationsPage(self.page),
-            3: MessagesPage(self.page),
-            4: ChatPage(self.page),
-            5: ProfilePage(self.page, any_user_id=any_user_id),
-            6: SettingsPage(self.page),
+            #3: MessagesPage(self.page),
+            3: ChatPage(self.page),
+            4: ProfilePage(self.page, any_user_id=any_user_id, logged_in_user_id=self.logged_in_user_id),
+            5: SettingsPage(self.page),
         }
+
+        
+    def display_user_profile(self, any_user_id):
+        """ユーザープロファイルを表示"""
+        profile_page = ProfilePage(self.page, any_user_id=any_user_id, logged_in_user_id=self.logged_in_user_id)
+        self.content_view.content = profile_page
+        self.update()
 
     def create_view_container(self, initial_index):
         """ビューを含むコンテナを作成"""
@@ -158,6 +166,20 @@ class MainPage(ft.View):
         selected_index = e.control.selected_index
         self.content_view.content = self.views[selected_index]
         self.update()
+
+    def update_timeline(self):
+        """タイムラインを更新するメソッド"""
+        # すべてのビューを更新
+        for view in self.views.values():
+            if hasattr(view, 'update_timeline'):
+                view.update_timeline()
+        
+        # 現在表示中のビューを更新
+        if hasattr(self.content_view.content, 'update_timeline'):
+            self.content_view.content.update_timeline()
+        
+        self.page.update()
+
 
     def show_post_page(self, e):
         """ダイアログを表示"""

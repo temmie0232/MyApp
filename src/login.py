@@ -139,19 +139,37 @@ class Login(ft.View):
         self.dlg_message.open = False
         self.page.update()
 
+    # ... (previous code remains unchanged)
+
     def show_greeting_dialog(self):
         """挨拶ダイアログの表示"""
+        content = ft.Column([
+            ft.Text("以下のメールアドレスと\nパスワードでテストアカウントからログインできます。"),
+            ft.Text("メールアドレス: root\nパスワード: root", weight=ft.FontWeight.BOLD),
+            ft.Text("登録がPC以外からアクセスするとレイアウトが崩れる可能性あり\n制作途中のため、完成していなページ・バグが存在しています"),
+            ft.Container(
+                content=ft.Text("大切な情報は入力しないでください！", color=ft.colors.WHITE),
+                bgcolor=ft.colors.RED,
+                padding=5,
+                border_radius=5,
+            ),
+            ft.TextButton("リポジトリを開く"),
+            ft.TextButton("Fletのドキュメントを開く"),
+            ft.Text("Webアプリ開発やプログラム全般においてまだ十分慣れていないため、コードに誤りや不整合がある場合があります。\nまた、GitHubの使用にも不慣れなため、リポジトリの管理や運用に不備があるかもしれません。"),
+        ])
+
         greeting_dialog = ft.AlertDialog(
             modal=True,
             title=ft.Text("⚠注意"),
-            content=ft.Column([ft.Text("登録が面倒な方のために、以下のメールアドレスと\nパスワードで簡単にログインできるように設定しています\n\nメールアドレス: root\nパスワード: root\n\n登録がPC以外からアクセスするとレイアウトが崩れる可能性あり\n制作途中のため、完成していなページ・バグが存在しています\n"),
-                               ft.Container(content=ft.Text(" 大切な情報は入力しないでください！",color=ft.colors.WHITE),bgcolor=ft.colors.RED),
-                            ft.TextButton(text="リポジトリを開く"),
-                            ft.TextButton(text="Fletのドキュメントを開く\n"),
-                            ft.Text("私は、Webアプリ開発(flet)やプログラム全般においてまだ十分慣れていないため、\nコードに誤りや不整合がある場合があります。\nまた、GitHubの使用にも不慣れなため、リポジトリの管理や運用に\n不備があるかもしれません。")]),
-            actions=[ft.TextButton("ok", on_click=self.close_greeting_dialog)],
+            content=ft.Container(
+                content=content,
+                height=400,  
+                width=400,  
+            ),
+            actions=[ft.TextButton("OK", on_click=self.close_greeting_dialog)],
             actions_alignment=ft.MainAxisAlignment.END
         )
+
         self.page.dialog = greeting_dialog
         greeting_dialog.open = True
         self.page.update()

@@ -170,6 +170,9 @@ class SearchPage(ft.Container):
         # ラベルを更新
         self.update_search_label()
 
+        # 検索対象が変更されたらすぐにフィルタリング
+        self.display_filtered_data()
+
     def check_user_item_clicked(self, e):
         """ユーザー検索クリックハンドリング"""
         self.search_target_user = not self.search_target_user
@@ -182,6 +185,9 @@ class SearchPage(ft.Container):
 
         # ラベルを更新
         self.update_search_label()
+
+        # 検索対象が変更されたらすぐにフィルタリング
+        self.display_filtered_data()
 
     def update_popup_menu(self):
         """ポップアップメニューの状態を更新"""
@@ -206,6 +212,7 @@ class SearchPage(ft.Container):
         """検索バーの変更イベントをハンドル"""
         self.display_filtered_data()
 
+
     def display_filtered_data(self):
         """検索フィールドの内容に基づいてフィルタリングされたデータを表示"""
         keyword = self.search_field.value.lower()
@@ -213,14 +220,42 @@ class SearchPage(ft.Container):
 
         if self.search_target_post:
             filtered_posts = [post for post in self.all_posts if keyword in post['content'].lower()]
-            for post in filtered_posts:
-                post_container = PostCard(post)
-                self.main_lv.controls.append(post_container)
+            if filtered_posts:
+                for post in filtered_posts:
+                    post_container = PostCard(post)
+                    self.main_lv.controls.append(post_container)
+            else:
+                self.main_lv.controls.append(self.create_no_results_message())
 
         elif self.search_target_user:
             filtered_users = [user for user in self.all_users if keyword in user['any_user_id'].lower()]
-            for user in filtered_users:
-                user_container = UserCard(user)
-                self.main_lv.controls.append(user_container)
+            if filtered_users:
+                for user in filtered_users:
+                    user_container = UserCard(user, on_click=self.show_user_profile)
+                    self.main_lv.controls.append(user_container)
+            else:
+                self.main_lv.controls.append(self.create_no_results_message())
 
         self.page.update()
+
+    def create_no_results_message(self):
+        """検索結果が見つからない場合のメッセージを作成"""
+        return ft.Container(
+            content=ft.Text("検索結果が見つかりませんでした", size=16, color="#888888"),
+            alignment=ft.alignment.center,
+            padding=20,
+            height=100,
+            width=530,
+        )
+
+    def show_user_profile(self, any_user_id):
+        """ユーザープロファイルを表示"""
+        
+        # MainPageのインスタンスを取得
+        main_page = self.page.views[0] 
+         
+        main_page.display_user_profile(any_user_id)
+
+    def update_timeline(self):
+        """検索結果を更新するメソッド"""
+        self.display_filtered_data()  # 検索結果を再表示

@@ -40,7 +40,7 @@ class TimelinePage(ft.Container):
     # UIの配置
     def create_main_layout(self):
         return ft.Column([
-            ft.Container(self.top_bar,alignment=ft.alignment.center),
+            ft.Container(self.top_bar, alignment=ft.alignment.center, height = 58),
             ft.Container(ft.Divider(), alignment=ft.alignment.center),
             ft.Container(content=ft.Row([
                 ft.VerticalDivider(),
@@ -75,5 +75,10 @@ class TimelinePage(ft.Container):
             
     # 投稿をリロードするメソッド
     def reload_posts(self, e):
+        self.main_lv.controls.clear()  # 現在の投稿をクリア
+        self.load_posts()  # 再度投稿を読み込む
+
+    def update_timeline(self):
+        """タイムラインを更新するメソッド"""
         self.main_lv.controls.clear()  # 現在の投稿をクリア
         self.load_posts()  # 再度投稿を読み込む
