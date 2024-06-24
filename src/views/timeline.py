@@ -77,3 +77,8 @@ class TimelinePage(ft.Container):
     def reload_posts(self, e):
         self.main_lv.controls.clear()  # 現在の投稿をクリア
         self.load_posts()  # 再度投稿を読み込む
+
+    def update_timeline(self):
+        """タイムラインを更新するメソッド"""
+        self.main_lv.controls.clear()  # 現在の投稿をクリア
+        self.load_posts()  # 再度投稿を読み込む

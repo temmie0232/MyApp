@@ -238,3 +238,7 @@ class SearchPage(ft.Container):
         main_page = self.page.views[0] 
          
         main_page.display_user_profile(any_user_id)
+
+    def update_timeline(self):
+        """検索結果を更新するメソッド"""
+        self.display_filtered_data()  # 検索結果を再表示

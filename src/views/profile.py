@@ -317,3 +317,8 @@ class ProfilePage(ft.Container):
     def send_message(self, e):
         """メッセージ送信処理（仮）"""
         print("メッセージを送信する処理")
+
+    def update_timeline(self):
+        """プロフィールページの投稿リストを更新するメソッド"""
+        self.main_lv.controls.clear()  # 現在の投稿をクリア
+        self.load_posts()  # 再度投稿を読み込む

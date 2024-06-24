@@ -34,7 +34,7 @@ class MainPage(ft.View):
         self.views = self.init_views()
         self.content_view = self.create_view_container(initial_index=0)
         
-        self.post_page = PostPage(self.page)  # ダイアログインスタンスを作成
+        self.post_page = PostPage(self.page, on_post_success=self.update_timeline)  # ダイアログインスタンスを作成
     
     def create_navigation_rail(self):
         """ナビゲーションレールの作成"""
@@ -166,6 +166,20 @@ class MainPage(ft.View):
         selected_index = e.control.selected_index
         self.content_view.content = self.views[selected_index]
         self.update()
+
+    def update_timeline(self):
+        """タイムラインを更新するメソッド"""
+        # すべてのビューを更新
+        for view in self.views.values():
+            if hasattr(view, 'update_timeline'):
+                view.update_timeline()
+        
+        # 現在表示中のビューを更新
+        if hasattr(self.content_view.content, 'update_timeline'):
+            self.content_view.content.update_timeline()
+        
+        self.page.update()
+
 
     def show_post_page(self, e):
         """ダイアログを表示"""
