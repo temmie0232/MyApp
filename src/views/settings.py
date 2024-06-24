@@ -5,7 +5,7 @@ class SettingsPage(ft.Container):
         super().__init__()
         
         self.page = page
-        self.padding = 200
+        self.padding = 350
         self.bgcolor = "#f2ede7"
         self.border_radius = 20
         self.expand = True
